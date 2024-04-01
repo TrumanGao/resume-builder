@@ -212,43 +212,47 @@ onBeforeMount(() => {
 
   .left-title,
   .right-title {
-    font-size: 18rem;
+    font-size: 16rem;
     line-height: 2;
     font-weight: 800;
     white-space: normal;
     word-wrap: break-word;
     text-decoration: underline;
     text-underline-offset: 0.25em;
+    margin-bottom: 2rem;
   }
   .right-subtitle {
-    font-size: 16rem;
+    font-size: 14rem;
     line-height: 1.5;
     font-weight: 600;
     white-space: normal;
     word-wrap: break-word;
+    margin-bottom: 2rem;
   }
   .left-text,
   .right-text {
-    font-size: 14rem;
+    font-size: 12rem;
     line-height: 1.5;
     font-weight: 400;
     white-space: normal;
     word-wrap: break-word;
+    margin-bottom: 2rem;
   }
   .right-minitext {
-    font-size: 14rem;
+    font-size: 12rem;
     line-height: 1.5;
     font-weight: 400;
     color: #999999;
     white-space: normal;
     word-wrap: break-word;
+    margin-bottom: 2rem;
   }
 }
 
 a {
   color: #000000;
   &:hover {
-    color: #10365c;
+    color: var(--color_blue-1);
   }
 }
 
@@ -264,7 +268,7 @@ a {
     width: 100vw;
     min-height: 100vh;
     padding: 5vh 0;
-    background-color: #656e83;
+    background-color: var(--color_gray-1);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -279,7 +283,7 @@ a {
 
       .resume-left {
         width: @main-left-width;
-        background-color: #10365c;
+        background-color: var(--color_blue-1);
         color: #ffffff;
 
         .resume-profile {
@@ -391,7 +395,7 @@ a {
     position: fixed;
     right: 2vw;
     bottom: 5vh;
-    height: 200px;
+    height: 30vh;
   }
 }
 </style>

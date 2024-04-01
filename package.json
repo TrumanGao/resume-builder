@@ -47,6 +47,7 @@
     "type": "git",
     "url": "git+https://github.com/TrumanGao/resume-builder.git"
   },
+  "homepage": "https://trumangao.github.io/resume-builder/dist/#/resume/aamirkhan",
   "license": "MIT",
   "keywords": [
     "resume"
