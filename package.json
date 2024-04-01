@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config vite/vite.development.ts",
-    "build": "vite build --config vite/vite.production.ts",
+    "build": "rimraf dist && vite build --config vite/vite.production.ts",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
