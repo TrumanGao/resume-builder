@@ -1,0 +1,8 @@
+.resume
+
+node_modules
+.DS_Store
+dist
+
+auto-imports.d.ts
+components.d.ts

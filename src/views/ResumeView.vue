@@ -1,0 +1,380 @@
+<!-- https://www.npmjs.com/package/jspdf -->
+<script setup lang="ts">
+import { onBeforeMount, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+import { useResumeStore } from '../stores/resume'
+const resumeStore = useResumeStore()
+import { type ResumeData } from '../index.d'
+
+/**
+ * 数据源
+ */
+const profilePhoto = ref('')
+const resumeData = ref<ResumeData>({
+  profile: {},
+  detail: {},
+  skill: [],
+  statment: {},
+  education: [],
+  employment: [],
+  project: [],
+  link: []
+})
+watch(
+  () => route.params.username,
+  async (username) => {
+    resumeData.value = resumeStore.resumeMap[username as string]
+    profilePhoto.value = (await import(`../assets/img/profile-photo/${username}.jpg`)).default
+  },
+  {
+    immediate: true
+  }
+)
+
+/**
+ * 尺寸
+ */
+const fontSizeInit = 0.1
+const fontSizeRatio = ref(100)
+watch(
+  fontSizeRatio,
+  (ratio) => {
+    document.documentElement.style.setProperty('font-size', `${fontSizeInit * (ratio / 100)}vw`)
+  },
+  {
+    immediate: true
+  }
+)
+
+onBeforeMount(() => {
+  console.log('current username:', route.params.username)
+})
+</script>
+
+<template>
+  <div class="resume-view">
+    <div class="resume-container">
+      <!-- page -->
+      <div class="resume-main">
+        <div class="resume-left">
+          <section class="resume-profile">
+            <div class="profile-photo-container">
+              <img class="profile-photo" :src="profilePhoto" alt="照片" />
+            </div>
+            <div v-if="resumeData.profile.name" class="profile-name">
+              {{ resumeData.profile.name }}
+            </div>
+            <div v-if="resumeData.profile.job" class="profile-job">
+              {{ resumeData.profile.job }}
+            </div>
+          </section>
+
+          <div class="left-margin"></div>
+
+          <section class="resume-detail">
+            <div class="left-title">基本信息</div>
+            <div v-if="resumeData.detail.origin" class="left-text detail-origin">
+              籍贯：{{ resumeData.detail.origin }}
+            </div>
+            <div v-if="resumeData.detail.address" class="left-text detail-address">
+              现居地：{{ resumeData.detail.address }}
+            </div>
+            <div v-if="resumeData.detail.email" class="left-text detail-email">
+              邮箱：{{ resumeData.detail.email }}
+            </div>
+            <div v-if="resumeData.detail.phone" class="left-text detail-phone">
+              联系方式：{{ resumeData.detail.phone }}
+            </div>
+            <div v-if="resumeData.detail.wechat" class="left-text detail-wechat">
+              微信：{{ resumeData.detail.wechat }}
+            </div>
+          </section>
+
+          <div class="left-margin"></div>
+
+          <section v-if="resumeData.skill.length" class="resume-skill">
+            <div class="left-title">技术栈</div>
+            <div class="skill-item" v-for="skill in resumeData.skill" :key="skill">
+              <div class="left-text skill-item">{{ skill }}</div>
+            </div>
+          </section>
+        </div>
+
+        <div class="resume-right">
+          <section v-if="resumeData.statment.content" class="resume-statment">
+            <div class="right-title">个人陈述</div>
+            <div class="right-text statment-content">
+              {{ resumeData.statment.content }}
+            </div>
+          </section>
+
+          <div class="right-margin"></div>
+
+          <section v-if="resumeData.education.length" class="resume-education">
+            <div class="right-title">教育经历</div>
+            <div
+              class="education-item"
+              v-for="education in resumeData.education"
+              :key="education.time"
+            >
+              <div class="right-subtitle education-employer">
+                {{ `${education.school}  ${education.degree}` }}
+              </div>
+              <div class="right-minitext education-time">{{ education.time }}</div>
+              <div class="right-text education-description">{{ education.description }}</div>
+            </div>
+          </section>
+
+          <div class="right-margin"></div>
+
+          <section v-if="resumeData.employment.length" class="resume-employment">
+            <div class="right-title">工作履历</div>
+            <div
+              class="employment-item"
+              v-for="employment in resumeData.employment"
+              :key="employment.time"
+            >
+              <div class="right-subtitle employment-employer">{{ employment.employer }}</div>
+              <div class="right-minitext employment-time">{{ employment.time }}</div>
+              <div class="right-text employment-description">{{ employment.description }}</div>
+            </div>
+          </section>
+
+          <div class="right-margin"></div>
+
+          <section v-if="resumeData.project.length" class="resume-project">
+            <div class="right-title">项目作品</div>
+            <div class="project-item" v-for="project in resumeData.project" :key="project.url">
+              <div class="right-subtitle project-label">{{ project.label }}</div>
+              <a class="right-text project-url" :href="project.url" target="_blank">
+                {{ project.url }}
+              </a>
+            </div>
+          </section>
+
+          <div class="right-margin"></div>
+
+          <section v-if="resumeData.link.length" class="resume-link">
+            <div class="right-title">个人主页</div>
+            <div class="link-item" v-for="link in resumeData.link" :key="link.url">
+              <div class="right-subtitle link-label">{{ link.label }}</div>
+              <a class="right-text link-url" :href="link.url" target="_blank">
+                {{ link.url }}
+              </a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- zoom -->
+    <el-slider
+      class="resume-slider"
+      v-model="fontSizeRatio"
+      :min="50"
+      :max="150"
+      :step="5"
+      vertical
+      placement="left"
+    />
+  </div>
+</template>
+
+<style lang="less" scoped>
+// A4: 210 × 297
+// golden ratio: 0.618
+@main-width: 600rem;
+@main-height: calc(@main-width / 210 * 297);
+@main-left-width: calc(@main-width * 0.618 * 0.618);
+@main-padding_vertical: 60rem;
+@main-padding_horizontal: 40rem;
+@photo-size: calc(@main-left-width - @main-padding_horizontal * 2);
+
+.resume-main {
+  .resume-left,
+  .resume-right {
+    padding: @main-padding_vertical @main-padding_horizontal;
+  }
+  .left-margin {
+    margin-bottom: 30rem;
+  }
+  .right-margin {
+    margin-bottom: 10rem;
+  }
+
+  .left-title,
+  .right-title {
+    font-size: 18rem;
+    line-height: 2;
+    font-weight: 800;
+  }
+  .right-subtitle {
+    font-size: 16rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+  .left-text,
+  .right-text {
+    font-size: 14rem;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+  .right-minitext {
+    font-size: 14rem;
+    line-height: 1.5;
+    font-weight: 400;
+    color: #999999;
+  }
+}
+
+a {
+  color: #000000;
+  &:hover {
+    color: #10365c;
+  }
+}
+
+.resume-view {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  .resume-container {
+    position: absolute;
+    width: 100vw;
+    min-height: 100vh;
+    padding: 5vh 0;
+    background-color: #656e83;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .resume-main {
+      width: @main-width;
+      height: @main-height;
+      background-color: #ffffff;
+      border-radius: 5rem;
+      overflow: hidden;
+      display: flex;
+
+      .resume-left {
+        width: @main-left-width;
+        background-color: #10365c;
+        color: #ffffff;
+
+        .resume-profile {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .profile-photo-container {
+            width: @photo-size;
+            height: @photo-size;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            background-color: #ffffff;
+            margin-bottom: 5rem;
+
+            .profile-photo {
+              width: calc(@photo-size * 1.3);
+              height: calc(@photo-size * 1.3);
+            }
+          }
+          .profile-name {
+            font-size: 20rem;
+            line-height: 2;
+            letter-spacing: 1px;
+          }
+          .profile-job {
+            font-size: 14rem;
+            line-height: 1.5;
+            letter-spacing: 1px;
+          }
+        }
+        .resume-detail {
+          // .left-title {
+          // }
+          // .left-text {
+          // }
+        }
+        .resume-skill {
+          // .left-title {
+          // }
+          // .left-text {
+          // }
+        }
+      }
+
+      .resume-right {
+        flex: 1 0;
+        background-color: #ffffff;
+        color: #000000;
+
+        .resume-statment {
+          // .right-title {
+          // }
+          // .right-text {
+          // }
+        }
+        .resume-employment {
+          // .right-title {
+          // }
+          .employment-item {
+            // .right-subtitle {
+            // }
+            // .right-minitext {
+            // }
+            // .right-text {
+            // }
+          }
+        }
+        .resume-education {
+          // .right-title {
+          // }
+          .education-item {
+            // .right-subtitle {
+            // }
+            // .right-minitext {
+            // }
+            // .right-text {
+            // }
+          }
+        }
+        .resume-link {
+          // .right-title {
+          // }
+          .link-item {
+            // .right-subtitle {
+            // }
+            // .right-text {
+            // }
+          }
+        }
+        .resume-project {
+          // .right-title {
+          // }
+          .project-item {
+            // .right-subtitle {
+            // }
+            // .right-text {
+            // }
+          }
+        }
+      }
+    }
+  }
+
+  .resume-slider {
+    position: fixed;
+    right: 2vw;
+    bottom: 5vh;
+    height: 200px;
+  }
+}
+</style>
