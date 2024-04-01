@@ -1,11 +1,12 @@
 <!-- https://www.npmjs.com/package/jspdf -->
 <script setup lang="ts">
-import { onBeforeMount, ref, watch } from 'vue'
+import { onBeforeMount, ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 import { useResumeStore } from '../stores/resume'
 const resumeStore = useResumeStore()
 import { type ResumeData } from '../index.d'
+import { downloadPDF } from '../utils/tool'
 
 /**
  * 数据源
@@ -53,6 +54,16 @@ watch(
 onBeforeMount(() => {
   console.log('current username:', route.params.username)
 })
+
+function handleDownloadPdf() {
+  fontSizeRatio.value = 100
+  nextTick(() => {
+    downloadPDF({
+      element: document.querySelector('.resume-main') as HTMLElement,
+      pdfName: `${resumeData.value.profile.name}-${resumeData.value.profile.job}.pdf`
+    })
+  })
+}
 </script>
 
 <template>
@@ -171,7 +182,7 @@ onBeforeMount(() => {
 
     <!-- zoom -->
     <el-slider
-      class="resume-slider"
+      class="resume-zoom"
       v-model="fontSizeRatio"
       :min="50"
       :max="150"
@@ -179,6 +190,8 @@ onBeforeMount(() => {
       vertical
       placement="left"
     />
+
+    <el-button type="plain" class="resume-download" @click="handleDownloadPdf">下载PDF</el-button>
   </div>
 </template>
 
@@ -217,8 +230,6 @@ onBeforeMount(() => {
     font-weight: 800;
     white-space: normal;
     word-wrap: break-word;
-    text-decoration: underline;
-    text-underline-offset: 0.25em;
     margin-bottom: 2rem;
   }
   .right-subtitle {
@@ -391,11 +402,18 @@ a {
     }
   }
 
-  .resume-slider {
+  .resume-zoom {
     position: fixed;
     right: 2vw;
     bottom: 5vh;
     height: 30vh;
+  }
+
+  .resume-download {
+    position: fixed;
+    right: 4vw;
+    top: 5vh;
+    letter-spacing: 0.1vh;
   }
 }
 </style>
