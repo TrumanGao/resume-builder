@@ -207,7 +207,7 @@ onBeforeMount(() => {
     margin-bottom: 30rem;
   }
   .right-margin {
-    margin-bottom: 20rem;
+    margin-bottom: 15rem;
   }
 
   .left-title,
@@ -240,7 +240,7 @@ onBeforeMount(() => {
   }
   .right-minitext {
     font-size: 12rem;
-    line-height: 1.5;
+    line-height: 1.2;
     font-weight: 400;
     color: #999999;
     white-space: normal;
