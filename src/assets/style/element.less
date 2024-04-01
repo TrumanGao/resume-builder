@@ -3,7 +3,7 @@
   .el-slider__runway {
     width: @slider-width;
     border-radius: calc(@slider-width / 2);
-    border: 0.3vh solid #ffffff;
+    border: 1px solid #ffffff;
     background-color: #999999;
 
     .el-slider__bar {
@@ -12,11 +12,11 @@
       border-radius: calc(@slider-width / 2);
     }
     .el-slider__button-wrapper {
-      left: -2vh;
+      left: -14px;
       .el-slider__button {
-        width: 3vh;
-        height: 3vh;
-        border: 0.3vh solid var(--color_blue-1);
+        width: calc(@slider-width * 1.8);
+        height: calc(@slider-width * 1.8);
+        border: 1px solid var(--color_blue-1);
       }
     }
   }

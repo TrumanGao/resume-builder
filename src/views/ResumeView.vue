@@ -44,7 +44,11 @@ const fontSizeRatio = ref(100)
 watch(
   fontSizeRatio,
   (ratio) => {
-    document.documentElement.style.setProperty('font-size', `${fontSizeInit * (ratio / 100)}vw`)
+    if (window.innerWidth > window.innerHeight) {
+      document.documentElement.style.setProperty('font-size', `${fontSizeInit * (ratio / 100)}vw`)
+    } else {
+      document.documentElement.style.setProperty('font-size', `${fontSizeInit * (ratio / 100)}vh`)
+    }
   },
   {
     immediate: true
