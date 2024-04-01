@@ -13,3 +13,7 @@ app.use(pinia)
 app.use(router)
 
 app.mount('#app')
+
+console.log('路由基准地址：', import.meta.env.BASE_URL)
+
+console.log('内存中的简历数据：', process.env.RESUME_MAP)
