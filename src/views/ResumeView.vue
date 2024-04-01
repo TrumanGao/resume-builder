@@ -24,6 +24,9 @@ const resumeData = ref<ResumeData>({
 watch(
   () => route.params.username,
   async (username) => {
+    if (!resumeStore.resumeMap[username as string]) {
+      return
+    }
     resumeData.value = resumeStore.resumeMap[username as string]
     profilePhoto.value = (await import(`../assets/img/profile-photo/${username}.jpg`)).default
   },
@@ -68,11 +71,10 @@ onBeforeMount(() => {
             <div v-if="resumeData.profile.job" class="profile-job">
               {{ resumeData.profile.job }}
             </div>
+            <div class="left-margin"></div>
           </section>
 
-          <div class="left-margin"></div>
-
-          <section class="resume-detail">
+          <section v-if="Object.keys(resumeData.detail)?.length" class="resume-detail">
             <div class="left-title">基本信息</div>
             <div v-if="resumeData.detail.origin" class="left-text detail-origin">
               籍贯：{{ resumeData.detail.origin }}
@@ -89,13 +91,12 @@ onBeforeMount(() => {
             <div v-if="resumeData.detail.wechat" class="left-text detail-wechat">
               微信：{{ resumeData.detail.wechat }}
             </div>
+            <div class="left-margin"></div>
           </section>
-
-          <div class="left-margin"></div>
 
           <section v-if="resumeData.skill.length" class="resume-skill">
             <div class="left-title">技术栈</div>
-            <div class="skill-item" v-for="skill in resumeData.skill" :key="skill">
+            <div class="left-item skill-item" v-for="skill in resumeData.skill" :key="skill">
               <div class="left-text skill-item">{{ skill }}</div>
             </div>
           </section>
@@ -107,14 +108,13 @@ onBeforeMount(() => {
             <div class="right-text statment-content">
               {{ resumeData.statment.content }}
             </div>
+            <div class="right-margin"></div>
           </section>
-
-          <div class="right-margin"></div>
 
           <section v-if="resumeData.education.length" class="resume-education">
             <div class="right-title">教育经历</div>
             <div
-              class="education-item"
+              class="right-item education-item"
               v-for="education in resumeData.education"
               :key="education.time"
             >
@@ -124,14 +124,13 @@ onBeforeMount(() => {
               <div class="right-minitext education-time">{{ education.time }}</div>
               <div class="right-text education-description">{{ education.description }}</div>
             </div>
+            <div class="right-margin"></div>
           </section>
-
-          <div class="right-margin"></div>
 
           <section v-if="resumeData.employment.length" class="resume-employment">
             <div class="right-title">工作履历</div>
             <div
-              class="employment-item"
+              class="right-item employment-item"
               v-for="employment in resumeData.employment"
               :key="employment.time"
             >
@@ -139,25 +138,27 @@ onBeforeMount(() => {
               <div class="right-minitext employment-time">{{ employment.time }}</div>
               <div class="right-text employment-description">{{ employment.description }}</div>
             </div>
+            <div class="right-margin"></div>
           </section>
-
-          <div class="right-margin"></div>
 
           <section v-if="resumeData.project.length" class="resume-project">
             <div class="right-title">项目作品</div>
-            <div class="project-item" v-for="project in resumeData.project" :key="project.url">
+            <div
+              class="right-item project-item"
+              v-for="project in resumeData.project"
+              :key="project.url"
+            >
               <div class="right-subtitle project-label">{{ project.label }}</div>
               <a class="right-text project-url" :href="project.url" target="_blank">
                 {{ project.url }}
               </a>
             </div>
+            <div class="right-margin"></div>
           </section>
-
-          <div class="right-margin"></div>
 
           <section v-if="resumeData.link.length" class="resume-link">
             <div class="right-title">个人主页</div>
-            <div class="link-item" v-for="link in resumeData.link" :key="link.url">
+            <div class="right-item link-item" v-for="link in resumeData.link" :key="link.url">
               <div class="right-subtitle link-label">{{ link.label }}</div>
               <a class="right-text link-url" :href="link.url" target="_blank">
                 {{ link.url }}
@@ -196,11 +197,17 @@ onBeforeMount(() => {
   .resume-right {
     padding: @main-padding_vertical @main-padding_horizontal;
   }
+  .left-item {
+    margin-bottom: 5rem;
+  }
+  .right-item {
+    margin-bottom: 5rem;
+  }
   .left-margin {
     margin-bottom: 30rem;
   }
   .right-margin {
-    margin-bottom: 10rem;
+    margin-bottom: 20rem;
   }
 
   .left-title,
@@ -208,23 +215,33 @@ onBeforeMount(() => {
     font-size: 18rem;
     line-height: 2;
     font-weight: 800;
+    white-space: normal;
+    word-wrap: break-word;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
   }
   .right-subtitle {
     font-size: 16rem;
     line-height: 1.5;
     font-weight: 600;
+    white-space: normal;
+    word-wrap: break-word;
   }
   .left-text,
   .right-text {
     font-size: 14rem;
     line-height: 1.5;
     font-weight: 400;
+    white-space: normal;
+    word-wrap: break-word;
   }
   .right-minitext {
     font-size: 14rem;
     line-height: 1.5;
     font-weight: 400;
     color: #999999;
+    white-space: normal;
+    word-wrap: break-word;
   }
 }
 
@@ -312,7 +329,7 @@ a {
       }
 
       .resume-right {
-        flex: 1 0;
+        width: calc(@main-width - @main-left-width);
         background-color: #ffffff;
         color: #000000;
 

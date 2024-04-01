@@ -1,4 +1,5 @@
-.resume
+.resume/**/*.json
+!.resume/aamirkhan.json
 
 node_modules
 .DS_Store

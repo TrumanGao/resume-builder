@@ -25,3 +25,7 @@ npm run build
 ```sh
 npm run lint
 ```
+
+## Githup Pages
+
+https://trumangao.github.io/resume-builder/dist/#/resume/aamirkhan

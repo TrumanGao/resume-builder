@@ -1,19 +1,24 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import ResumeView from '../views/ResumeView.vue'
-import WelcomeView from '../views/WelcomeView.vue'
+import BuilderView from '../views/BuilderView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'welcome',
-      component: WelcomeView
+      name: 'default',
+      redirect: '/resume/aamirkhan'
     },
     {
-      path: '/resume/:username',
+      path: '/resume/:username?',
       name: 'resume',
       component: ResumeView
+    },
+    {
+      path: '/builder',
+      name: 'builder',
+      component: BuilderView
     }
   ]
 })
