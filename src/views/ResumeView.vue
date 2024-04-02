@@ -9,6 +9,7 @@ import { type ResumeData } from '../index.d'
 import { downloadPDF } from '../utils/tool'
 import { EventManager } from 'trumangao-utils'
 const _e = new EventManager()
+import { debounce } from 'lodash'
 
 /**
  * 数据源
@@ -67,7 +68,7 @@ function handleResize(e?: Event) {
   }
   handleFontSizeRatio()
 }
-_e.addEventListener('resize', handleResize, 'window_resize_handleResize', window)
+_e.addEventListener('resize', debounce(handleResize, 200), 'window_resize_handleResize', window)
 _e.addEventListener(
   'orientationchange',
   handleResize,
@@ -97,7 +98,7 @@ function handleFontSizeRatio() {
   }
 }
 watch(fontSizeRatio, () => {
-  handleFontSizeRatio()
+  debounce(handleFontSizeRatio, 200)()
 })
 onMounted(() => {
   handleResize()
