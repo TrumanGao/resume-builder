@@ -1,12 +1,14 @@
 <!-- https://www.npmjs.com/package/jspdf -->
 <script setup lang="ts">
-import { onBeforeMount, ref, watch, nextTick } from 'vue'
+import { onBeforeMount, ref, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 import { useResumeStore } from '../stores/resume'
 const resumeStore = useResumeStore()
 import { type ResumeData } from '../index.d'
 import { downloadPDF } from '../utils/tool'
+import { EventManager } from 'trumangao-utils'
+const _e = new EventManager()
 
 /**
  * 数据源
@@ -37,26 +39,76 @@ watch(
 )
 
 /**
- * 尺寸
+ * 调整屏幕尺寸/方向
+ */
+const orientation = ref('landscape')
+const fontSizeRatioMin = ref(50)
+const fontSizeRatioMax = ref(150)
+/**
+ * 调整简历尺寸
  */
 const fontSizeInit = 0.1
 const fontSizeRatio = ref(100)
 watch(
   fontSizeRatio,
-  (ratio) => {
-    if (window.innerWidth > window.innerHeight) {
-      document.documentElement.style.setProperty('font-size', `${fontSizeInit * (ratio / 100)}vw`)
+  () => {
+    if (orientation.value === 'landscape') {
+      const fontSizeVW = fontSizeInit * (fontSizeRatio.value / 100)
+      const fontSizePX = (window.innerWidth / 100) * fontSizeVW
+      console.log('fontSizePX:', fontSizePX)
+      if (fontSizePX >= 0.6) {
+        document.documentElement.style.setProperty('font-size', `${fontSizeVW}vw`)
+      } else {
+        document.documentElement.style.setProperty('font-size', `${0.6}px`)
+      }
     } else {
-      document.documentElement.style.setProperty('font-size', `${fontSizeInit * (ratio / 100)}vh`)
+      const fontSizeVH = fontSizeInit * (fontSizeRatio.value / 100)
+      const fontSizePX = (window.innerHeight / 100) * fontSizeVH
+      console.log('fontSizePX:', fontSizePX)
+      if (fontSizePX >= 0.6) {
+        document.documentElement.style.setProperty('font-size', `${fontSizeVH}vh`)
+      } else {
+        document.documentElement.style.setProperty('font-size', `${0.6}px`)
+      }
     }
   },
   {
     immediate: true
   }
 )
+function handleResize(e?: Event) {
+  console.log('触发 handleResize: ', e)
+  if (window.innerWidth > window.innerHeight) {
+    orientation.value = 'landscape'
+    fontSizeRatioMin.value = 50
+    fontSizeRatioMax.value = 150
+  } else {
+    orientation.value = 'portrait'
+    fontSizeRatioMin.value = 100
+    fontSizeRatioMax.value = 200
+  }
+  if (fontSizeRatio.value < fontSizeRatioMin.value) {
+    fontSizeRatio.value = fontSizeRatioMin.value
+  } else if (fontSizeRatio.value > fontSizeRatioMax.value) {
+    fontSizeRatio.value = fontSizeRatioMax.value
+  }
+}
+_e.addEventListener('resize', handleResize, 'window_resize_handleResize', window)
+_e.addEventListener(
+  'orientationchange',
+  handleResize,
+  'window_orientationchange_handleResize',
+  window
+)
+handleResize()
 
 onBeforeMount(() => {
   console.log('current username:', route.params.username)
+})
+
+onBeforeUnmount(() => {
+  _e.removeEventListener('resize', 'window_resize_handleResize', window)
+  _e.removeEventListener('orientationchange', 'window_orientationchange_handleResize', window)
 })
 
 function handleDownloadPdf() {
@@ -72,7 +124,10 @@ function handleDownloadPdf() {
 
 <template>
   <div class="resume-view">
-    <div class="resume-container">
+    <div
+      class="resume-container"
+      :style="{ padding: orientation === 'landscape' ? '0 5vh' : '5vh 0' }"
+    >
       <!-- page -->
       <div class="resume-main">
         <div class="resume-left">
@@ -188,14 +243,14 @@ function handleDownloadPdf() {
     <el-slider
       class="resume-zoom"
       v-model="fontSizeRatio"
-      :min="50"
-      :max="150"
-      :step="5"
+      :min="fontSizeRatioMin"
+      :max="fontSizeRatioMax"
+      :step="2"
       vertical
       placement="left"
     />
 
-    <el-button type="plain" class="resume-download" @click="handleDownloadPdf">下载PDF</el-button>
+    <!-- <el-button type="plain" class="resume-download" @click="handleDownloadPdf">下载PDF</el-button> -->
   </div>
 </template>
 
@@ -276,13 +331,12 @@ a {
   width: 100vw;
   height: 100vh;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
 
   .resume-container {
     position: absolute;
-    width: 100vw;
+    min-width: 100vw;
     min-height: 100vh;
-    padding: 5vh 0;
     background-color: var(--color_gray-1);
     display: flex;
     justify-content: center;
