@@ -1,6 +1,6 @@
 <!-- https://www.npmjs.com/package/jspdf -->
 <script setup lang="ts">
-import { onBeforeMount, ref, watch, nextTick, onBeforeUnmount } from 'vue'
+import { onBeforeMount, onMounted, ref, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 import { useResumeStore } from '../stores/resume'
@@ -49,33 +49,6 @@ const fontSizeRatioMax = ref(150)
  */
 const fontSizeInit = 0.1
 const fontSizeRatio = ref(100)
-watch(
-  fontSizeRatio,
-  () => {
-    if (orientation.value === 'landscape') {
-      const fontSizeVW = fontSizeInit * (fontSizeRatio.value / 100)
-      const fontSizePX = (window.innerWidth / 100) * fontSizeVW
-      console.log('fontSizePX:', fontSizePX)
-      if (fontSizePX >= 0.6) {
-        document.documentElement.style.setProperty('font-size', `${fontSizeVW}vw`)
-      } else {
-        document.documentElement.style.setProperty('font-size', `${0.6}px`)
-      }
-    } else {
-      const fontSizeVH = fontSizeInit * (fontSizeRatio.value / 100)
-      const fontSizePX = (window.innerHeight / 100) * fontSizeVH
-      console.log('fontSizePX:', fontSizePX)
-      if (fontSizePX >= 0.6) {
-        document.documentElement.style.setProperty('font-size', `${fontSizeVH}vh`)
-      } else {
-        document.documentElement.style.setProperty('font-size', `${0.6}px`)
-      }
-    }
-  },
-  {
-    immediate: true
-  }
-)
 function handleResize(e?: Event) {
   console.log('触发 handleResize: ', e)
   if (window.innerWidth > window.innerHeight) {
@@ -84,14 +57,15 @@ function handleResize(e?: Event) {
     fontSizeRatioMax.value = 150
   } else {
     orientation.value = 'portrait'
-    fontSizeRatioMin.value = 100
-    fontSizeRatioMax.value = 200
+    fontSizeRatioMin.value = 50
+    fontSizeRatioMax.value = 150
   }
   if (fontSizeRatio.value < fontSizeRatioMin.value) {
     fontSizeRatio.value = fontSizeRatioMin.value
   } else if (fontSizeRatio.value > fontSizeRatioMax.value) {
     fontSizeRatio.value = fontSizeRatioMax.value
   }
+  handleFontSizeRatio()
 }
 _e.addEventListener('resize', handleResize, 'window_resize_handleResize', window)
 _e.addEventListener(
@@ -100,7 +74,35 @@ _e.addEventListener(
   'window_orientationchange_handleResize',
   window
 )
-handleResize()
+function handleFontSizeRatio() {
+  console.log('触发 watch fontSizeRatio: ', fontSizeRatio.value)
+  if (orientation.value === 'landscape') {
+    const fontSizeVW = fontSizeInit * (fontSizeRatio.value / 100)
+    const fontSizePX = (window.innerWidth / 100) * fontSizeVW
+    console.log('fontSizePX:', fontSizePX)
+    if (fontSizePX >= 0.6) {
+      document.documentElement.style.setProperty('font-size', `${fontSizeVW}vw`)
+    } else {
+      document.documentElement.style.setProperty('font-size', `${0.6}px`)
+    }
+  } else {
+    const fontSizeVH = fontSizeInit * (fontSizeRatio.value / 100)
+    const fontSizePX = (window.innerHeight / 100) * fontSizeVH
+    console.log('fontSizePX:', fontSizePX)
+    if (fontSizePX >= 0.6) {
+      document.documentElement.style.setProperty('font-size', `${fontSizeVH}vh`)
+    } else {
+      document.documentElement.style.setProperty('font-size', `${0.6}px`)
+    }
+  }
+}
+watch(fontSizeRatio, () => {
+  handleFontSizeRatio()
+})
+onMounted(() => {
+  handleResize()
+  handleFontSizeRatio()
+})
 
 onBeforeMount(() => {
   console.log('current username:', route.params.username)
