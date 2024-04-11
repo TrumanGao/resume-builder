@@ -3,8 +3,13 @@ import { jsPDF } from 'jspdf'
 
 export async function downloadPDF(option: { element: HTMLElement; pdfName: string }) {
   const { element, pdfName = 'resume.pdf' } = option
-  const canvas = await html2canvas(element)
-  const imgData = canvas.toDataURL('image/png')
+  const canvas = await html2canvas(element, {
+    scale: window.devicePixelRatio * 2,
+    useCORS: true,
+    allowTaint: true,
+    logging: false
+  })
+  const imgData = canvas.toDataURL('image/jpeg', 1.0)
 
   const pdf = new jsPDF()
 
@@ -12,7 +17,7 @@ export async function downloadPDF(option: { element: HTMLElement; pdfName: strin
   const imgProps = pdf.getImageProperties(imgData)
   const pdfWidth = pdf.internal.pageSize.getWidth()
   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
-  pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+  pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST')
 
   pdf.save(pdfName)
 }

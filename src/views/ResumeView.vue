@@ -115,12 +115,9 @@ onBeforeUnmount(() => {
 })
 
 function handleDownloadPdf() {
-  fontSizeRatio.value = 100
-  nextTick(() => {
-    downloadPDF({
-      element: document.querySelector('.resume-main') as HTMLElement,
-      pdfName: `${resumeData.value.profile.name}-${resumeData.value.profile.job}.pdf`
-    })
+  downloadPDF({
+    element: document.querySelector('.resume-main') as HTMLElement,
+    pdfName: `${resumeData.value.profile.name}-${resumeData.value.profile.job}.pdf`
   })
 }
 </script>
@@ -253,7 +250,7 @@ function handleDownloadPdf() {
       placement="left"
     />
 
-    <!-- <el-button type="plain" class="resume-download" @click="handleDownloadPdf">下载PDF</el-button> -->
+    <el-button type="plain" class="resume-download" @click="handleDownloadPdf">下载PDF</el-button>
   </div>
 </template>
 
