@@ -1,6 +1,6 @@
 <!-- https://www.npmjs.com/package/jspdf -->
 <script setup lang="ts">
-import { onBeforeMount, onMounted, ref, watch, nextTick, onBeforeUnmount } from 'vue'
+import { onBeforeMount, onMounted, ref, watch, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 import { useResumeStore } from '../stores/resume'
@@ -98,11 +98,10 @@ function handleFontSizeRatio() {
   }
 }
 watch(fontSizeRatio, () => {
-  debounce(handleFontSizeRatio, 200)()
+  debounce(handleFontSizeRatio, 100)()
 })
 onMounted(() => {
   handleResize()
-  handleFontSizeRatio()
 })
 
 onBeforeMount(() => {
@@ -114,11 +113,22 @@ onBeforeUnmount(() => {
   _e.removeEventListener('orientationchange', 'window_orientationchange_handleResize', window)
 })
 
+const downloadLoading = ref(false)
 function handleDownloadPdf() {
-  downloadPDF({
-    element: document.querySelector('.resume-main') as HTMLElement,
-    pdfName: `${resumeData.value.profile.name}-${resumeData.value.profile.job}.pdf`
-  })
+  if (downloadLoading.value) {
+    return
+  }
+  downloadLoading.value = true
+  fontSizeRatio.value = 100 // fontSizeRatioMax.value
+  // 延迟不能少于 debounce 的时间
+  setTimeout(() => {
+    downloadPDF({
+      element: document.querySelector('.resume-main') as HTMLElement,
+      pdfName: `${resumeData.value.profile.name}-${resumeData.value.profile.job}.pdf`
+    })
+      .then(() => (downloadLoading.value = false))
+      .catch(() => (downloadLoading.value = false))
+  }, 200)
 }
 </script>
 
@@ -249,8 +259,12 @@ function handleDownloadPdf() {
       vertical
       placement="left"
     />
-
-    <el-button type="plain" class="resume-download" @click="handleDownloadPdf">下载PDF</el-button>
+    <el-button type="plain" class="resume-download" @click="handleDownloadPdf">
+      <el-icon :class="{ 'is-loading': downloadLoading }" v-show="downloadLoading">
+        <Loading />
+      </el-icon>
+      <span v-show="!downloadLoading">下载PDF</span>
+    </el-button>
   </div>
 </template>
 
@@ -468,10 +482,15 @@ a {
   }
 
   .resume-download {
+    width: 100px;
     position: fixed;
     right: 4vw;
     top: 5vh;
     letter-spacing: 0.1vh;
+
+    .el-icon {
+      font-size: 20px;
+    }
   }
 }
 </style>
