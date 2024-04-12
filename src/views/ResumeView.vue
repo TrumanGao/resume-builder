@@ -58,6 +58,7 @@ const fontSizeRatioMax = ref(150)
 const fontSizeInit = 0.1
 const fontSizeRatio = ref(100)
 function handleResize() {
+  console.log(`window.innerWidth: ${window.innerWidth}, window.innerHeight: ${window.innerHeight}`)
   if (window.innerWidth > window.innerHeight) {
     orientation.value = 'landscape'
     fontSizeRatioMin.value = 50
@@ -87,6 +88,7 @@ _e.addEventListener(
   window
 )
 function handleFontSizeRatio() {
+  console.log('fontSizeRatio: ', fontSizeRatio.value)
   if (orientation.value === 'landscape') {
     const fontSizeVW = fontSizeInit * (fontSizeRatio.value / 100)
     const fontSizePX = (window.innerWidth / 100) * fontSizeVW
