@@ -25,14 +25,19 @@ const resumeData = ref<ResumeData>({
   project: [],
   link: []
 })
+const resumeTitle = ref('')
 watch(
   () => route.params.username,
-  async (username) => {
+  (username) => {
     if (!resumeStore.resumeMap[username as string]) {
       return
     }
-    resumeData.value = resumeStore.resumeMap[username as string]
-    profilePhoto.value = (await import(`../assets/img/profile-photo/${username}.jpg`)).default
+    import(`../assets/img/profile-photo/${username}.jpg`).then((res) => {
+      profilePhoto.value = res.default
+    })
+    resumeData.value = resumeStore.resumeMap[username as string].zh
+    resumeTitle.value = `${resumeData.value.profile.name}-${resumeData.value.profile.job}`
+    document.title = resumeTitle.value
   },
   {
     immediate: true
@@ -50,8 +55,7 @@ const fontSizeRatioMax = ref(150)
  */
 const fontSizeInit = 0.1
 const fontSizeRatio = ref(100)
-function handleResize(e?: Event) {
-  console.log('触发 handleResize: ', e)
+function handleResize() {
   if (window.innerWidth > window.innerHeight) {
     orientation.value = 'landscape'
     fontSizeRatioMin.value = 50
@@ -76,11 +80,10 @@ _e.addEventListener(
   window
 )
 function handleFontSizeRatio() {
-  console.log('触发 watch fontSizeRatio: ', fontSizeRatio.value)
   if (orientation.value === 'landscape') {
     const fontSizeVW = fontSizeInit * (fontSizeRatio.value / 100)
     const fontSizePX = (window.innerWidth / 100) * fontSizeVW
-    console.log('fontSizePX:', fontSizePX)
+    // console.log('fontSizePX:', fontSizePX)
     if (fontSizePX >= 0.6) {
       document.documentElement.style.setProperty('font-size', `${fontSizeVW}vw`)
     } else {
@@ -89,7 +92,7 @@ function handleFontSizeRatio() {
   } else {
     const fontSizeVH = fontSizeInit * (fontSizeRatio.value / 100)
     const fontSizePX = (window.innerHeight / 100) * fontSizeVH
-    console.log('fontSizePX:', fontSizePX)
+    // console.log('fontSizePX:', fontSizePX)
     if (fontSizePX >= 0.6) {
       document.documentElement.style.setProperty('font-size', `${fontSizeVH}vh`)
     } else {
@@ -124,9 +127,9 @@ function handleDownloadPdf() {
   setTimeout(() => {
     downloadPDF({
       element: document.querySelector('.resume-main') as HTMLElement,
-      pdfName: `${resumeData.value.profile.name}-${resumeData.value.profile.job}.pdf`
+      pdfName: `${resumeTitle.value}.pdf`
     })
-      .then(() => (downloadLoading.value = false))
+      .then(() => setTimeout(() => (downloadLoading.value = false), 500))
       .catch(() => (downloadLoading.value = false))
   }, 200)
 }
@@ -165,7 +168,7 @@ function handleDownloadPdf() {
               邮箱：{{ resumeData.detail.email }}
             </div>
             <div v-if="resumeData.detail.phone" class="left-text left-item">
-              联系方式：{{ resumeData.detail.phone }}
+              手机号码：{{ resumeData.detail.phone }}
             </div>
             <div v-if="resumeData.detail.wechat" class="left-text left-item">
               微信：{{ resumeData.detail.wechat }}
@@ -204,7 +207,7 @@ function handleDownloadPdf() {
           </section>
 
           <section v-if="resumeData.employment.length" class="resume-employment right-section">
-            <div class="right-title">工作履历</div>
+            <div class="right-title">工作经历</div>
             <div
               class="right-item employment-item"
               v-for="employment in resumeData.employment"
