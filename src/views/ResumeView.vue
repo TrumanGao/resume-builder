@@ -6,10 +6,12 @@ const route = useRoute()
 import { useResumeStore } from '../stores/resume'
 const resumeStore = useResumeStore()
 import { type ResumeData } from '../index.d'
-import { downloadPDF, isWechat } from '../utils/tool'
+import debounce from 'lodash.debounce'
 import { EventManager } from 'trumangao-utils'
 const _e = new EventManager()
-import debounce from 'lodash.debounce'
+import { downloadPDF, isWechat } from '../utils/tool'
+import('html2canvas')
+import('jspdf')
 
 /**
  * 数据源
@@ -427,12 +429,13 @@ a {
             margin-bottom: 5rem;
 
             .profile-photo {
-              width: calc(@photo-size * 1.3);
-              height: calc(@photo-size * 1.3);
+              width: @photo-size;
+              height: @photo-size;
             }
             .profile-photo_placeholder {
               font-size: @photo-size;
               position: relative;
+              color: var(--color_blue-1);
               &::after {
                 content: '';
                 display: block;
