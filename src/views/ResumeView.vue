@@ -141,7 +141,7 @@ function handleDownloadPdf() {
       <!-- page -->
       <div class="resume-main">
         <div class="resume-left">
-          <section class="resume-profile">
+          <section class="resume-profile left-section">
             <div class="profile-photo-container">
               <img class="profile-photo" :src="profilePhoto" alt="照片" />
             </div>
@@ -151,30 +151,28 @@ function handleDownloadPdf() {
             <div v-if="resumeData.profile.job" class="profile-job">
               {{ resumeData.profile.job }}
             </div>
-            <div class="left-margin"></div>
           </section>
 
-          <section v-if="Object.keys(resumeData.detail)?.length" class="resume-detail">
+          <section v-if="Object.keys(resumeData.detail)?.length" class="resume-detail left-section">
             <div class="left-title">基本信息</div>
-            <div v-if="resumeData.detail.origin" class="left-text detail-origin">
+            <div v-if="resumeData.detail.origin" class="left-text right-item">
               籍贯：{{ resumeData.detail.origin }}
             </div>
-            <div v-if="resumeData.detail.address" class="left-text detail-address">
+            <div v-if="resumeData.detail.address" class="left-text left-item">
               现居地：{{ resumeData.detail.address }}
             </div>
-            <div v-if="resumeData.detail.email" class="left-text detail-email">
+            <div v-if="resumeData.detail.email" class="left-text left-item">
               邮箱：{{ resumeData.detail.email }}
             </div>
-            <div v-if="resumeData.detail.phone" class="left-text detail-phone">
+            <div v-if="resumeData.detail.phone" class="left-text left-item">
               联系方式：{{ resumeData.detail.phone }}
             </div>
-            <div v-if="resumeData.detail.wechat" class="left-text detail-wechat">
+            <div v-if="resumeData.detail.wechat" class="left-text left-item">
               微信：{{ resumeData.detail.wechat }}
             </div>
-            <div class="left-margin"></div>
           </section>
 
-          <section v-if="resumeData.skill.length" class="resume-skill">
+          <section v-if="resumeData.skill.length" class="resume-skill left-section">
             <div class="left-title">技术栈</div>
             <div class="left-item skill-item" v-for="skill in resumeData.skill" :key="skill">
               <div class="left-text skill-item">{{ skill }}</div>
@@ -183,15 +181,14 @@ function handleDownloadPdf() {
         </div>
 
         <div class="resume-right">
-          <section v-if="resumeData.statment.content" class="resume-statment">
+          <section v-if="resumeData.statment.content" class="resume-statment right-section">
             <div class="right-title">个人陈述</div>
             <div class="right-text statment-content">
               {{ resumeData.statment.content }}
             </div>
-            <div class="right-margin"></div>
           </section>
 
-          <section v-if="resumeData.education.length" class="resume-education">
+          <section v-if="resumeData.education.length" class="resume-education right-section">
             <div class="right-title">教育经历</div>
             <div
               class="right-item education-item"
@@ -204,10 +201,9 @@ function handleDownloadPdf() {
               <div class="right-minitext education-time">{{ education.time }}</div>
               <div class="right-text education-description">{{ education.description }}</div>
             </div>
-            <div class="right-margin"></div>
           </section>
 
-          <section v-if="resumeData.employment.length" class="resume-employment">
+          <section v-if="resumeData.employment.length" class="resume-employment right-section">
             <div class="right-title">工作履历</div>
             <div
               class="right-item employment-item"
@@ -218,10 +214,9 @@ function handleDownloadPdf() {
               <div class="right-minitext employment-time">{{ employment.time }}</div>
               <div class="right-text employment-description">{{ employment.description }}</div>
             </div>
-            <div class="right-margin"></div>
           </section>
 
-          <section v-if="resumeData.project.length" class="resume-project">
+          <section v-if="resumeData.project.length" class="resume-project right-section">
             <div class="right-title">项目作品</div>
             <div
               class="right-item project-item"
@@ -233,10 +228,9 @@ function handleDownloadPdf() {
                 {{ project.url }}
               </a>
             </div>
-            <div class="right-margin"></div>
           </section>
 
-          <section v-if="resumeData.link.length" class="resume-link">
+          <section v-if="resumeData.link.length" class="resume-link right-section">
             <div class="right-title">个人主页</div>
             <div class="right-item link-item" v-for="link in resumeData.link" :key="link.url">
               <div class="right-subtitle link-label">{{ link.label }}</div>
@@ -274,62 +268,78 @@ function handleDownloadPdf() {
 @main-width: 600rem;
 @main-height: calc(@main-width / 210 * 297);
 @main-left-width: calc(@main-width * 0.618 * 0.618);
-@main-padding_vertical: 60rem;
+@main-padding_vertical: 50rem;
 @main-padding_horizontal: 40rem;
 @photo-size: calc(@main-left-width - @main-padding_horizontal * 2);
+
+@margin-bottom_left-section: 30rem;
+@margin-bottom_left-item: 5rem;
+@margin-bottom_right-section: 20rem;
+@margin-bottom_right-item: 5rem;
+
+@font-size_title: 16rem;
+@margin-bottom_title: 5rem;
+@font-size_subtitle: 14rem;
+@margin-bottom_subtitle: 2rem;
+@font-size_text: 14rem;
+@margin-bottom_text: 2rem;
+@font-size_minitext: 12rem;
+@margin-bottom_minitext: 2rem;
 
 .resume-main {
   .resume-left,
   .resume-right {
     padding: @main-padding_vertical @main-padding_horizontal;
   }
+  .left-section {
+    margin-bottom: @margin-bottom_left-section;
+  }
+  .right-section {
+    margin-bottom: @margin-bottom_right-section;
+  }
   .left-item {
-    margin-bottom: 5rem;
+    margin-bottom: @margin-bottom_left-item;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
   .right-item {
-    margin-bottom: 5rem;
-  }
-  .left-margin {
-    margin-bottom: 30rem;
-  }
-  .right-margin {
-    margin-bottom: 15rem;
+    margin-bottom: @margin-bottom_right-item;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   .left-title,
   .right-title {
-    font-size: 16rem;
-    line-height: 2;
+    font-size: @font-size_title;
+    margin-bottom: @margin-bottom_title;
     font-weight: 800;
     white-space: normal;
     word-wrap: break-word;
-    margin-bottom: 2rem;
   }
   .right-subtitle {
-    font-size: 14rem;
-    line-height: 1.5;
+    font-size: @font-size_subtitle;
+    margin-bottom: @margin-bottom_subtitle;
     font-weight: 600;
     white-space: normal;
     word-wrap: break-word;
-    margin-bottom: 2rem;
   }
   .left-text,
   .right-text {
-    font-size: 12rem;
-    line-height: 1.5;
+    font-size: @font-size_text;
+    margin-bottom: @margin-bottom_text;
     font-weight: 400;
     white-space: normal;
     word-wrap: break-word;
-    margin-bottom: 2rem;
   }
   .right-minitext {
-    font-size: 12rem;
-    line-height: 1.2;
+    font-size: @font-size_minitext;
+    margin-bottom: @margin-bottom_minitext;
     font-weight: 400;
     color: #999999;
     white-space: normal;
     word-wrap: break-word;
-    margin-bottom: 2rem;
   }
 }
 
@@ -360,12 +370,12 @@ a {
       width: @main-width;
       height: @main-height;
       background-color: #ffffff;
-      border-radius: 5rem;
       overflow: hidden;
       display: flex;
 
       .resume-left {
         width: @main-left-width;
+        height: @main-height;
         background-color: var(--color_blue-1);
         color: #ffffff;
 
@@ -417,6 +427,7 @@ a {
 
       .resume-right {
         width: calc(@main-width - @main-left-width);
+        height: @main-height;
         background-color: #ffffff;
         color: #000000;
 
