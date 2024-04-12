@@ -15,6 +15,7 @@ import { debounce } from 'lodash'
  * 数据源
  */
 const profilePhoto = ref('')
+const profilePhotoLoaded = ref(false)
 const resumeData = ref<ResumeData>({
   profile: {},
   detail: {},
@@ -146,7 +147,16 @@ function handleDownloadPdf() {
         <div class="resume-left">
           <section class="resume-profile left-section">
             <div class="profile-photo-container">
-              <img class="profile-photo" :src="profilePhoto" alt="照片" />
+              <img
+                v-show="profilePhotoLoaded"
+                class="profile-photo"
+                :src="profilePhoto"
+                alt="照片"
+                @load="() => (profilePhotoLoaded = true)"
+              />
+              <el-icon v-show="!profilePhotoLoaded" class="profile-photo_placeholder">
+                <Avatar />
+              </el-icon>
             </div>
             <div v-if="resumeData.profile.name" class="profile-name">
               {{ resumeData.profile.name }}
@@ -401,6 +411,19 @@ a {
             .profile-photo {
               width: calc(@photo-size * 1.3);
               height: calc(@photo-size * 1.3);
+            }
+            .profile-photo_placeholder {
+              font-size: @photo-size;
+              position: relative;
+              &::after {
+                content: '';
+                display: block;
+                background-color: var(--color_blue-1);
+                position: absolute;
+                bottom: 0;
+                width: calc(@photo-size);
+                height: calc(@photo-size / 5);
+              }
             }
           }
           .profile-name {
