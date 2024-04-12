@@ -7,7 +7,7 @@ import { useResumeStore } from '../stores/resume'
 const resumeStore = useResumeStore()
 import { type ResumeData } from '../index.d'
 import debounce from 'lodash.debounce'
-import { EventManager } from 'trumangao-utils'
+import { EventManager, caniuse_webp } from 'trumangao-utils'
 const _e = new EventManager()
 import { downloadPDF, isWechat } from '../utils/tool'
 import('html2canvas')
@@ -35,9 +35,20 @@ watch(
     if (!resumeStore.resumeMap[username as string]) {
       return
     }
-    import(`../assets/img/profile-photo/${username}.jpg`).then((res) => {
-      profilePhoto.value = res.default
-    })
+    import(`../assets/img/profile-photo/${username}.webp`)
+      .then((res) => {
+        if (caniuse_webp()) {
+          profilePhoto.value = res.default
+        } else {
+          throw new Error('Webp not supported. ')
+        }
+      })
+      .catch((error) => {
+        console.log('Webp load error. ', error)
+        import(`../assets/img/profile-photo/${username}.jpg`).then((res) => {
+          profilePhoto.value = res.default
+        })
+      })
     resumeData.value = resumeStore.resumeMap[username as string].zh
     resumeTitle.value = `${resumeData.value.profile.name}-${resumeData.value.profile.job}`
     document.title = resumeTitle.value

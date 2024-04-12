@@ -4,7 +4,7 @@ export async function downloadPDF(option: { element: HTMLElement; pdfName: strin
   const html2canvas = (await import('html2canvas')).default
 
   const canvas = await html2canvas(element, {
-    scale: window.devicePixelRatio * 2,
+    scale: window.devicePixelRatio * 2 || 3,
     useCORS: true,
     allowTaint: true,
     logging: false
