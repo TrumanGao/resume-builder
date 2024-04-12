@@ -125,8 +125,7 @@ function handleDownloadPdf() {
       type: 'warning',
       plain: true,
       grouping: true,
-      showClose: true,
-      duration: 200000
+      showClose: true
     })
   }
   if (downloadLoading.value) {
