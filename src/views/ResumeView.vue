@@ -6,7 +6,7 @@ const route = useRoute()
 import { useResumeStore } from '../stores/resume'
 const resumeStore = useResumeStore()
 import { type ResumeData } from '../index.d'
-import { downloadPDF } from '../utils/tool'
+import { downloadPDF, isWechat } from '../utils/tool'
 import { EventManager } from 'trumangao-utils'
 const _e = new EventManager()
 import { debounce } from 'lodash'
@@ -119,6 +119,16 @@ onBeforeUnmount(() => {
 
 const downloadLoading = ref(false)
 function handleDownloadPdf() {
+  if (isWechat()) {
+    return ElMessage({
+      message: '请点击右上角，在浏览器打开',
+      type: 'warning',
+      plain: true,
+      grouping: true,
+      showClose: true,
+      duration: 200000
+    })
+  }
   if (downloadLoading.value) {
     return
   }
@@ -519,14 +529,16 @@ a {
   }
 
   .resume-download {
-    width: 100px;
+    width: 90px;
     position: fixed;
     right: 4vw;
     top: 5vh;
-    letter-spacing: 0.1vh;
 
     .el-icon {
       font-size: 20px;
+    }
+    span {
+      margin-left: 0;
     }
   }
 }

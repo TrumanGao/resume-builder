@@ -21,3 +21,9 @@ export async function downloadPDF(option: { element: HTMLElement; pdfName: strin
 
   pdf.save(pdfName)
 }
+
+export function isWechat() {
+  return (
+    /MicroMessenger/i.test(window.navigator.userAgent) || /wxwork/i.test(window.navigator.userAgent)
+  )
+}
