@@ -9,7 +9,7 @@ import { type ResumeData } from '../index.d'
 import { downloadPDF, isWechat } from '../utils/tool'
 import { EventManager } from 'trumangao-utils'
 const _e = new EventManager()
-import { debounce } from 'lodash'
+import debounce from 'lodash.debounce'
 
 /**
  * 数据源
@@ -45,6 +45,7 @@ watch(
   }
 )
 
+const DEBOUNCE_DURATION = 100
 /**
  * 调整屏幕尺寸/方向
  */
@@ -73,7 +74,12 @@ function handleResize() {
   }
   handleFontSizeRatio()
 }
-_e.addEventListener('resize', debounce(handleResize, 200), 'window_resize_handleResize', window)
+_e.addEventListener(
+  'resize',
+  debounce(handleResize, DEBOUNCE_DURATION),
+  'window_resize_handleResize',
+  window
+)
 _e.addEventListener(
   'orientationchange',
   handleResize,
@@ -101,8 +107,9 @@ function handleFontSizeRatio() {
     }
   }
 }
+const _handleFontSizeRatio = debounce(handleFontSizeRatio, DEBOUNCE_DURATION)
 watch(fontSizeRatio, () => {
-  debounce(handleFontSizeRatio, 100)()
+  _handleFontSizeRatio()
 })
 onMounted(() => {
   handleResize()
@@ -133,7 +140,7 @@ function handleDownloadPdf() {
   }
   downloadLoading.value = true
   fontSizeRatio.value = 100 // fontSizeRatioMax.value
-  // 延迟不能少于 debounce 的时间
+  // 延迟不能少于 debounce 的时间，即 DEBOUNCE_DURATION
   setTimeout(() => {
     downloadPDF({
       element: document.querySelector('.resume-main') as HTMLElement,
@@ -141,7 +148,7 @@ function handleDownloadPdf() {
     })
       .then(() => setTimeout(() => (downloadLoading.value = false), 500))
       .catch(() => (downloadLoading.value = false))
-  }, 200)
+  }, DEBOUNCE_DURATION + 100)
 }
 </script>
 
