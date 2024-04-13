@@ -1,0 +1,36 @@
+{
+  "zh": {
+    "MESSAGE_OPEN_IN_BROWSER": "请点击右上角，在浏览器打开",
+    "RESUME_DETAIL": "基本信息",
+    "RESUME_DETAIL_ORIGN": "籍贯",
+    "RESUME_DETAIL_ADDRESS": "现居地",
+    "RESUME_DETAIL_EMAIL": "邮箱",
+    "RESUME_DETAIL_PHONE": "手机号码",
+    "RESUME_DETAIL_WECHAT": "微信",
+    "RESUME_SKILLS": "技术栈",
+    "RESUME_STATMENT": "个人陈述",
+    "RESUME_EDUCATION": "教育经历",
+    "RESUME_EMPLOYMENT": "工作经历",
+    "RESUME_PROJECTS": "项目作品",
+    "RESUME_LINKS": "个人主页",
+    "DOWNLOAD_RESUME": "下载PDF",
+    "SELECT_LOCALE": "选择语言"
+  },
+  "en": {
+    "MESSAGE_OPEN_IN_BROWSER": "Please click the top right corner to open in browser",
+    "RESUME_DETAIL": "Detail",
+    "RESUME_DETAIL_ORIGN": "Origin",
+    "RESUME_DETAIL_ADDRESS": "Address",
+    "RESUME_DETAIL_EMAIL": "Email",
+    "RESUME_DETAIL_PHONE": "Phone",
+    "RESUME_DETAIL_WECHAT": "Wechat",
+    "RESUME_SKILLS": "Skills",
+    "RESUME_STATMENT": "Statment",
+    "RESUME_EDUCATION": "Education",
+    "RESUME_EMPLOYMENT": "Employment",
+    "RESUME_PROJECTS": "Projects",
+    "RESUME_LINKS": "Links",
+    "DOWNLOAD_RESUME": "Download PDF",
+    "SELECT_LOCALE": "Select Locale"
+  }
+}

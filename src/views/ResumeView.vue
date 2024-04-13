@@ -182,7 +182,7 @@ function handleDownloadPdf() {
                 v-show="profilePhotoLoaded"
                 class="profile-photo"
                 :src="profilePhoto"
-                alt="照片"
+                alt="photo"
                 @load="() => (profilePhotoLoaded = true)"
               />
               <el-icon v-show="!profilePhotoLoaded" class="profile-photo_placeholder">
