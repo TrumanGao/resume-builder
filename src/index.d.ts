@@ -36,5 +36,8 @@ export interface ResumeData {
 }
 
 export interface ResumeMap {
-  [username: string]: ResumeData
+  [username: string]: {
+    zh: ResumeData
+    en?: ResumeData
+  }
 }
