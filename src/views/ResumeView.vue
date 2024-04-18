@@ -1,11 +1,11 @@
 <!-- https://www.npmjs.com/package/jspdf -->
 <script setup lang="ts">
-import { onBeforeMount, onMounted, ref, watch, onBeforeUnmount } from 'vue'
+import { onBeforeMount, onMounted, ref, watch, onBeforeUnmount, computed } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-import { useResumeStore } from '../stores/resume'
-const resumeStore = useResumeStore()
-import { type ResumeData } from '../index.d'
+import { useLocaleStore } from '../stores/locale'
+const localeStore = useLocaleStore()
+import type { ResumeJSON } from '../index.d'
 import debounce from 'lodash.debounce'
 import { EventManager, caniuse_webp } from 'trumangao-utils'
 const _e = new EventManager()
@@ -16,48 +16,77 @@ import('jspdf')
 /**
  * 数据源
  */
-const profilePhoto = ref('')
+const resumeJSON = ref<ResumeJSON>()
+const profilePhoto = ref<string>()
 const profilePhotoLoaded = ref(false)
-const resumeData = ref<ResumeData>({
-  profile: {},
-  detail: {},
-  skill: [],
-  statment: {},
-  education: [],
-  employment: [],
-  project: [],
-  link: []
-})
-const resumeTitle = ref('')
 watch(
   () => route.params.username,
   (username) => {
-    if (!resumeStore.resumeMap[username as string]) {
-      return
-    }
-    import(`../assets/img/profile-photo/${username}.webp`)
+    import(`../locale/resume/${username}.json`)
       .then((res) => {
-        if (caniuse_webp()) {
-          profilePhoto.value = res.default
+        if (res.default) {
+          resumeJSON.value = res.default as ResumeJSON
+          // 首次加载时，如果当前语言不存在，则切换到第一个存在的语言
+          if (!resumeJSON.value[localeStore.locale]) {
+            localeStore.setLocale(Object.keys(resumeJSON.value)[0])
+          }
         } else {
-          throw new Error('Webp not supported. ')
+          throw new Error(localeStore.message.FILE_DID_NOT_FOUND)
         }
       })
       .catch((error) => {
-        console.log('Webp load error. ', error)
-        import(`../assets/img/profile-photo/${username}.jpg`).then((res) => {
-          profilePhoto.value = res.default
+        ElMessage({
+          message: error.message || localeStore.message.FILE_LOAD_ERROR,
+          type: 'error',
+          plain: true,
+          grouping: true,
+          showClose: true
         })
       })
-    resumeData.value = resumeStore.resumeMap[username as string].zh
-    resumeTitle.value = `${resumeData.value.profile.name}-${resumeData.value.profile.job}`
-    document.title = resumeTitle.value
+
+    import(`../assets/img/profile-photo/${username}.webp`)
+      .then(async (res) => {
+        if (!res.default) {
+          throw new Error(localeStore.message.FILE_DID_NOT_FOUND)
+        } else if (!caniuse_webp()) {
+          throw new Error(localeStore.message.WEBP_NOT_SUPPORTED)
+        } else {
+          profilePhoto.value = res.default
+        }
+      })
+      .catch(async () => {
+        const res = await import(`../assets/img/profile-photo/${username}.jpg`)
+        if (!res.default) {
+          throw new Error(localeStore.message.FILE_DID_NOT_FOUND)
+        } else {
+          profilePhoto.value = res.default
+        }
+      })
+      .catch((error) => {
+        ElMessage({
+          message: error.message || localeStore.message.FILE_LOAD_ERROR,
+          type: 'error',
+          plain: true,
+          grouping: true,
+          showClose: true
+        })
+      })
   },
   {
     immediate: true
   }
 )
+const resumeData = computed(() => resumeJSON.value?.[localeStore.locale])
+const resumeTitle = computed(
+  () => `${resumeData?.value?.profile.name}-${resumeData?.value?.profile.job}`
+)
+watch(resumeTitle, (title) => {
+  document.title = title
+})
 
+/**
+ * 调整尺寸防抖
+ */
 const DEBOUNCE_DURATION = 100
 /**
  * 调整屏幕尺寸/方向
@@ -174,7 +203,7 @@ function handleDownloadPdf() {
       :style="{ padding: orientation === 'landscape' ? '0 5vh' : '5vh 0' }"
     >
       <!-- page -->
-      <div class="resume-main">
+      <div class="resume-main" v-if="resumeData">
         <div class="resume-left">
           <section class="resume-profile left-section">
             <div class="profile-photo-container">
@@ -297,6 +326,8 @@ function handleDownloadPdf() {
       vertical
       placement="left"
     />
+
+    <!-- download -->
     <el-button type="plain" class="resume-download" @click="handleDownloadPdf">
       <el-icon :class="{ 'is-loading': downloadLoading }" v-show="downloadLoading">
         <Loading />
