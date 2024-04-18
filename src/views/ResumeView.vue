@@ -327,13 +327,16 @@ function handleDownloadPdf() {
       placement="left"
     />
 
-    <!-- download -->
-    <el-button type="plain" class="resume-download" @click="handleDownloadPdf">
-      <el-icon :class="{ 'is-loading': downloadLoading }" v-show="downloadLoading">
-        <Loading />
-      </el-icon>
-      <span v-show="!downloadLoading">下载PDF</span>
-    </el-button>
+    <!-- menu -->
+    <div class="resume-menu">
+      <section>
+        <el-icon v-if="downloadLoading" class="menu-item is-loading"><Loading /></el-icon>
+        <el-icon v-else class="menu-item" @click="handleDownloadPdf"><Download /></el-icon>
+      </section>
+      <section>
+        <el-icon class="menu-item" @click="() => {}"><Menu /></el-icon>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -581,17 +584,39 @@ a {
     height: 30vh;
   }
 
-  .resume-download {
-    width: 90px;
+  .resume-menu {
     position: fixed;
-    right: 4vw;
-    top: 5vh;
+    right: 0;
+    top: 0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    border-radius: 0 0 0 4px;
+    overflow: hidden;
+    background-color: #f0f0f0;
 
-    .el-icon {
-      font-size: 20px;
-    }
-    span {
-      margin-left: 0;
+    section {
+      background-color: #ffffff;
+      padding: 5px;
+      cursor: pointer;
+      margin-right: 2px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      .el-icon {
+        opacity: 0.5;
+        font-size: 18px;
+        color: var(--color_blue-1);
+      }
+
+      &:hover,
+      &:active {
+        .el-icon {
+          opacity: 1;
+        }
+      }
     }
   }
 }
