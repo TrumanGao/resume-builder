@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import localeMessageMap from '../locale/message.json'
+import type { Locale } from '../index.d'
 
 export const useLocaleStore = defineStore({
   id: 'locale',
   state: (): {
-    locale: 'zh' | 'en'
+    locale: Locale
   } => ({
     locale: 'zh'
   }),
@@ -14,7 +15,7 @@ export const useLocaleStore = defineStore({
     }
   },
   actions: {
-    setLocale(locale: 'zh' | 'en') {
+    setLocale(locale: Locale) {
       this.locale = locale
     }
   }

@@ -39,3 +39,5 @@ export interface ResumeJSON {
   zh?: ResumeData
   en?: ResumeData
 }
+
+export type Locale = 'zh' | 'en'

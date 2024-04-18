@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 import { useLocaleStore } from '../stores/locale'
 const localeStore = useLocaleStore()
-import type { ResumeJSON } from '../index.d'
+import type { ResumeJSON, Locale } from '../index.d'
 import debounce from 'lodash.debounce'
 import { EventManager, caniuse_webp } from 'trumangao-utils'
 const _e = new EventManager()
@@ -182,17 +182,28 @@ function handleDownloadPdf() {
   if (downloadLoading.value) {
     return
   }
-  downloadLoading.value = true
-  fontSizeRatio.value = 100 // fontSizeRatioMax.value
-  // 延迟不能少于 debounce 的时间，即 DEBOUNCE_DURATION
-  setTimeout(() => {
-    downloadPDF({
-      element: document.querySelector('.resume-main') as HTMLElement,
-      pdfName: `${resumeTitle.value}.pdf`
+
+  ElMessageBox.confirm('是否下载简历？', '提示', {
+    confirmButtonText: '下载',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => {
+      downloadLoading.value = true
+      fontSizeRatio.value = 100 // fontSizeRatioMax.value
+      /**
+       * @warn 不能少于 debounce 的时间，即 DEBOUNCE_DURATION
+       */
+      setTimeout(() => {
+        downloadPDF({
+          element: document.querySelector('.resume-main') as HTMLElement,
+          pdfName: `${resumeTitle.value}.pdf`
+        })
+          .then(() => setTimeout(() => (downloadLoading.value = false), 500))
+          .catch(() => (downloadLoading.value = false))
+      }, DEBOUNCE_DURATION + 100)
     })
-      .then(() => setTimeout(() => (downloadLoading.value = false), 500))
-      .catch(() => (downloadLoading.value = false))
-  }, DEBOUNCE_DURATION + 100)
+    .catch(() => {})
 }
 </script>
 
@@ -333,9 +344,24 @@ function handleDownloadPdf() {
         <el-icon v-if="downloadLoading" class="menu-item is-loading"><Loading /></el-icon>
         <el-icon v-else class="menu-item" @click="handleDownloadPdf"><Download /></el-icon>
       </section>
-      <section>
-        <el-icon class="menu-item" @click="() => {}"><Menu /></el-icon>
-      </section>
+
+      <el-dropdown trigger="click" @command="(locale: Locale) => localeStore.setLocale(locale)">
+        <section>
+          <el-icon class="menu-item"><Menu /></el-icon>
+        </section>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item
+              v-for="locale in Object.keys(resumeJSON)"
+              :key="locale"
+              :command="locale"
+              :disabled="locale === localeStore.locale"
+            >
+              {{ locale }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
   </div>
 </template>
