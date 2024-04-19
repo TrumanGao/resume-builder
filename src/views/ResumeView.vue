@@ -10,8 +10,6 @@ import debounce from 'lodash.debounce'
 import { EventManager, caniuse_webp } from 'trumangao-utils'
 const _e = new EventManager()
 import { downloadPDF, isWechat } from '../utils/tool'
-import('html2canvas')
-import('jspdf')
 
 /**
  * 数据源
@@ -19,6 +17,13 @@ import('jspdf')
 const resumeJSON = ref<ResumeJSON>()
 const profilePhoto = ref<string>()
 const profilePhotoLoaded = ref(false)
+const packageLoaded = ref(false)
+function handleProfilePhotoLoaded() {
+  profilePhotoLoaded.value = true
+  Promise.all([import('html2canvas'), import('jspdf')])
+    .then(() => (packageLoaded.value = true))
+    .catch(() => (packageLoaded.value = true))
+}
 watch(
   () => route.params.username,
   (username) => {
@@ -170,6 +175,10 @@ onBeforeUnmount(() => {
 
 const downloadLoading = ref(false)
 function handleDownloadPdf() {
+  if (downloadLoading.value) {
+    return
+  }
+
   if (isWechat()) {
     return ElMessage({
       message: '请点击右上角，在浏览器打开',
@@ -178,9 +187,6 @@ function handleDownloadPdf() {
       grouping: true,
       showClose: true
     })
-  }
-  if (downloadLoading.value) {
-    return
   }
 
   ElMessageBox.confirm('是否下载简历？', '提示', {
@@ -223,7 +229,7 @@ function handleDownloadPdf() {
                 class="profile-photo"
                 :src="profilePhoto"
                 alt="photo"
-                @load="() => (profilePhotoLoaded = true)"
+                @load="handleProfilePhotoLoaded"
               />
               <el-icon v-show="!profilePhotoLoaded" class="profile-photo_placeholder">
                 <Avatar />
@@ -340,9 +346,9 @@ function handleDownloadPdf() {
 
     <!-- menu -->
     <div class="resume-menu">
-      <section>
+      <section v-if="packageLoaded" @click="handleDownloadPdf">
         <el-icon v-if="downloadLoading" class="menu-item is-loading"><Loading /></el-icon>
-        <el-icon v-else class="menu-item" @click="handleDownloadPdf"><Download /></el-icon>
+        <el-icon v-else class="menu-item"><Download /></el-icon>
       </section>
 
       <el-dropdown trigger="click" @command="(locale: Locale) => localeStore.setLocale(locale)">
@@ -522,11 +528,12 @@ a {
             font-size: 20rem;
             line-height: 2;
             letter-spacing: 1px;
+            text-align: center;
           }
           .profile-job {
-            font-size: 14rem;
+            font-size: 16rem;
             line-height: 1.5;
-            letter-spacing: 1px;
+            text-align: center;
           }
         }
         .resume-detail {
