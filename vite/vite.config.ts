@@ -10,12 +10,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
-import { getResumeMap } from './script'
-
 export const baseConfig: UserConfig = {
-  define: {
-    'process.env.RESUME_MAP': JSON.stringify(getResumeMap())
-  },
   plugins: [
     vue(),
     vueJsx(),

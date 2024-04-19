@@ -17,5 +17,3 @@ app.use(pinia)
 app.use(router)
 
 app.mount('#app')
-
-console.log('process.env.RESUME_MAP: ', process.env.RESUME_MAP)
