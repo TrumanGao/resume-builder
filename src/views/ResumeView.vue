@@ -31,7 +31,10 @@ watch(
       .then((res) => {
         if (res.default) {
           resumeJSON.value = res.default as ResumeJSON
-          // 首次加载时，如果当前语言不存在，则切换到第一个存在的语言
+          /**
+           * when first loaded, if the current language does not exist,
+           * switch to the first existing language
+           */
           if (!resumeJSON.value[localeStore.locale]) {
             localeStore.setLocale(Object.keys(resumeJSON.value)[0])
           }
@@ -90,17 +93,17 @@ watch(resumeTitle, (title) => {
 })
 
 /**
- * 调整尺寸防抖
+ * debounce when resize
  */
 const DEBOUNCE_DURATION = 100
 /**
- * 调整屏幕尺寸/方向
+ * resize orientation and screen size
  */
 const orientation = ref('landscape')
 const fontSizeRatioMin = ref(50)
 const fontSizeRatioMax = ref(150)
 /**
- * 调整简历尺寸
+ * resize resume size
  */
 const fontSizeInit = 0.1
 const fontSizeRatio = ref(100)
@@ -181,7 +184,7 @@ function handleDownloadPdf() {
 
   if (isWechat()) {
     return ElMessage({
-      message: '请点击右上角，在浏览器打开',
+      message: localeStore.message.MESSAGE_OPEN_IN_BROWSER,
       type: 'warning',
       plain: true,
       grouping: true,
@@ -189,11 +192,15 @@ function handleDownloadPdf() {
     })
   }
 
-  ElMessageBox.confirm('是否下载简历？', '提示', {
-    confirmButtonText: '下载',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
+  ElMessageBox.confirm(
+    localeStore.message.MESSAGE_DOWNLOAD_RESUME,
+    localeStore.message.MESSAGE_TITLE_INFO,
+    {
+      confirmButtonText: localeStore.message.MESSAGE_CONFIRM,
+      cancelButtonText: localeStore.message.MESSAGE_CANCEL,
+      type: 'warning'
+    }
+  )
     .then(() => {
       downloadLoading.value = true
       fontSizeRatio.value = 100 // fontSizeRatioMax.value
@@ -244,26 +251,26 @@ function handleDownloadPdf() {
           </section>
 
           <section v-if="Object.keys(resumeData.detail)?.length" class="resume-detail left-section">
-            <div class="left-title">基本信息</div>
+            <div class="left-title">{{ localeStore.message.RESUME_DETAIL }}</div>
             <div v-if="resumeData.detail.origin" class="left-text right-item">
-              籍贯：{{ resumeData.detail.origin }}
+              {{ localeStore.message.RESUME_DETAIL_ORIGN }}: {{ resumeData.detail.origin }}
             </div>
             <div v-if="resumeData.detail.address" class="left-text left-item">
-              现居地：{{ resumeData.detail.address }}
+              {{ localeStore.message.RESUME_DETAIL_ADDRESS }}: {{ resumeData.detail.address }}
             </div>
             <div v-if="resumeData.detail.email" class="left-text left-item">
-              邮箱：{{ resumeData.detail.email }}
+              {{ localeStore.message.RESUME_DETAIL_EMAIL }}: {{ resumeData.detail.email }}
             </div>
             <div v-if="resumeData.detail.phone" class="left-text left-item">
-              手机号码：{{ resumeData.detail.phone }}
+              {{ localeStore.message.RESUME_DETAIL_PHONE }}: {{ resumeData.detail.phone }}
             </div>
             <div v-if="resumeData.detail.wechat" class="left-text left-item">
-              微信：{{ resumeData.detail.wechat }}
+              {{ localeStore.message.RESUME_DETAIL_WECHAT }}: {{ resumeData.detail.wechat }}
             </div>
           </section>
 
           <section v-if="resumeData.skill.length" class="resume-skill left-section">
-            <div class="left-title">技术栈</div>
+            <div class="left-title">{{ localeStore.message.RESUME_SKILLS }}</div>
             <div class="left-item skill-item" v-for="skill in resumeData.skill" :key="skill">
               <div class="left-text skill-item">{{ skill }}</div>
             </div>
@@ -272,14 +279,14 @@ function handleDownloadPdf() {
 
         <div class="resume-right">
           <section v-if="resumeData.statment.content" class="resume-statment right-section">
-            <div class="right-title">个人陈述</div>
+            <div class="right-title">{{ localeStore.message.RESUME_STATMENT }}</div>
             <div class="right-text statment-content">
               {{ resumeData.statment.content }}
             </div>
           </section>
 
           <section v-if="resumeData.education.length" class="resume-education right-section">
-            <div class="right-title">教育经历</div>
+            <div class="right-title">{{ localeStore.message.RESUME_EDUCATION }}</div>
             <div
               class="right-item education-item"
               v-for="education in resumeData.education"
@@ -294,7 +301,7 @@ function handleDownloadPdf() {
           </section>
 
           <section v-if="resumeData.employment.length" class="resume-employment right-section">
-            <div class="right-title">工作经历</div>
+            <div class="right-title">{{ localeStore.message.RESUME_EMPLOYMENT }}</div>
             <div
               class="right-item employment-item"
               v-for="employment in resumeData.employment"
@@ -307,7 +314,7 @@ function handleDownloadPdf() {
           </section>
 
           <section v-if="resumeData.project.length" class="resume-project right-section">
-            <div class="right-title">项目作品</div>
+            <div class="right-title">{{ localeStore.message.RESUME_PROJECTS }}</div>
             <div
               class="right-item project-item"
               v-for="project in resumeData.project"
@@ -321,7 +328,7 @@ function handleDownloadPdf() {
           </section>
 
           <section v-if="resumeData.link.length" class="resume-link right-section">
-            <div class="right-title">个人主页</div>
+            <div class="right-title">{{ localeStore.message.RESUME_LINKS }}</div>
             <div class="right-item link-item" v-for="link in resumeData.link" :key="link.url">
               <div class="right-subtitle link-label">{{ link.label }}</div>
               <a class="right-text link-url" :href="link.url" target="_blank">
@@ -393,7 +400,7 @@ function handleDownloadPdf() {
 @margin-bottom_subtitle: 2rem;
 @font-size_text: 14rem;
 @margin-bottom_text: 2rem;
-@font-size_minitext: 12rem;
+@font-size_minitext: 14rem;
 @margin-bottom_minitext: 2rem;
 
 .resume-main {
