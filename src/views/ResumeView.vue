@@ -352,7 +352,7 @@ function handleDownloadPdf() {
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
-              v-for="locale in Object.keys(resumeJSON)"
+              v-for="(resume, locale) in resumeJSON"
               :key="locale"
               :command="locale"
               :disabled="locale === localeStore.locale"
