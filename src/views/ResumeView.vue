@@ -176,6 +176,12 @@ onBeforeUnmount(() => {
   _e.removeEventListener('orientationchange', 'window_orientationchange_handleResize', window)
 })
 
+const PRIMARY_COLORS = ['#10365c', '#331B1B', '#0A4D3E', '#0F171B', '#1A244C', '#3D2B23']
+const currentColor = ref(PRIMARY_COLORS[0])
+watch(currentColor, (color) => {
+  document.documentElement.style.setProperty('--color_primary-1', color)
+})
+
 const downloadLoading = ref(false)
 function handleDownloadPdf() {
   if (downloadLoading.value) {
@@ -358,7 +364,11 @@ function handleDownloadPdf() {
         <el-icon v-else class="menu-item"><Download /></el-icon>
       </section>
 
-      <el-dropdown trigger="click" @command="(locale: Locale) => localeStore.setLocale(locale)">
+      <el-dropdown
+        trigger="click"
+        :hide-on-click="false"
+        @command="(locale: Locale) => localeStore.setLocale(locale)"
+      >
         <section>
           <el-icon class="menu-item"><Menu /></el-icon>
         </section>
@@ -369,8 +379,33 @@ function handleDownloadPdf() {
               :key="locale"
               :command="locale"
               :disabled="locale === localeStore.locale"
+              class="dropdown-item dropdown-item_locale"
             >
               {{ locale }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+
+      <!-- set primary color -->
+      <el-dropdown
+        trigger="click"
+        :hide-on-click="false"
+        @command="(color: string) => (currentColor = color)"
+      >
+        <section>
+          <el-icon><BrushFilled /></el-icon>
+        </section>
+        <template #dropdown>
+          <el-dropdown-menu class="dropdown-menu dropdown-menu_color">
+            <el-dropdown-item
+              v-for="color in PRIMARY_COLORS"
+              :key="color"
+              :command="color"
+              :disabled="color === currentColor"
+              class="dropdown-item"
+            >
+              <div class="dropdown-item-inner" :style="{ backgroundColor: color }"></div>
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -463,7 +498,7 @@ function handleDownloadPdf() {
 a {
   color: #000000;
   &:hover {
-    color: var(--color_blue-1);
+    color: var(--color_primary-1);
   }
 }
 
@@ -493,7 +528,7 @@ a {
       .resume-left {
         width: @main-left-width;
         height: @main-height;
-        background-color: var(--color_blue-1);
+        background-color: var(--color_primary-1);
         color: #ffffff;
 
         .resume-profile {
@@ -519,11 +554,11 @@ a {
             .profile-photo_placeholder {
               font-size: @photo-size;
               position: relative;
-              color: var(--color_blue-1);
+              color: var(--color_primary-1);
               &::after {
                 content: '';
                 display: block;
-                background-color: var(--color_blue-1);
+                background-color: var(--color_primary-1);
                 position: absolute;
                 bottom: 0;
                 width: calc(@photo-size);
@@ -648,13 +683,33 @@ a {
       .el-icon {
         opacity: 0.5;
         font-size: 18px;
-        color: var(--color_blue-1);
+        color: var(--color_primary-1);
       }
 
       &:hover,
       &:active {
         .el-icon {
           opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+// set primary color
+.el-dropdown__popper {
+  .el-scrollbar {
+    .el-scrollbar__wrap {
+      .el-scrollbar__view.el-dropdown__list {
+        ul.el-dropdown-menu.dropdown-menu_color {
+          padding: 5px;
+          :deep(.el-dropdown-menu__item) {
+            padding: 2px;
+            .dropdown-item-inner {
+              width: 20px;
+              height: 20px;
+            }
+          }
         }
       }
     }

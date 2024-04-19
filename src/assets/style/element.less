@@ -7,7 +7,7 @@
     background-color: #999999;
 
     .el-slider__bar {
-      background-color: var(--color_blue-1);
+      background-color: var(--color_primary-1);
       width: 100%;
       border-radius: calc(@slider-width / 2);
     }
@@ -16,7 +16,7 @@
       .el-slider__button {
         width: calc(@slider-width * 1.8);
         height: calc(@slider-width * 1.8);
-        border: 1px solid var(--color_blue-1);
+        border: 1px solid var(--color_primary-1);
       }
     }
   }
@@ -27,8 +27,8 @@
   color: var(--color_gray-1);
 
   &:hover {
-    border-color: var(--color_blue-1);
-    color: var(--color_blue-1);
+    border-color: var(--color_primary-1);
+    color: var(--color_primary-1);
     background-color: #ffffff;
 
     span {
@@ -38,7 +38,7 @@
 }
 
 .el-icon {
-  color: var(--color_blue-1);
+  color: var(--color_primary-1);
 }
 
 .el-message {
@@ -49,5 +49,18 @@
   .el-message__content {
     font-size: 18rem;
     white-space: nowrap;
+  }
+}
+
+.el-dropdown__popper {
+  .el-scrollbar {
+    .el-scrollbar__wrap {
+      .el-scrollbar__view.el-dropdown__list {
+        ul.el-dropdown-menu {
+          li.el-dropdown-menu__item {
+          }
+        }
+      }
+    }
   }
 }
