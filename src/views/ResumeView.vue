@@ -11,6 +11,7 @@ import { EventManager, caniuse_webp } from 'trumangao-utils'
 const _e = new EventManager()
 import { downloadPDF, isWechat } from '../utils/tool'
 import {
+  UserOutlined,
   DownloadOutlined,
   LoadingOutlined,
   TranslationOutlined,
@@ -268,9 +269,7 @@ function handleDownloadPdf() {
                 alt="photo"
                 @load="handleProfilePhotoLoaded"
               />
-              <el-icon v-show="!profilePhotoLoaded" class="profile-photo_placeholder">
-                <Avatar />
-              </el-icon>
+              <UserOutlined v-show="!profilePhotoLoaded" class="profile-photo_placeholder" />
             </div>
             <div v-if="resumeData.profile.name" class="profile-name">
               {{ resumeData.profile.name }}
@@ -574,24 +573,17 @@ a {
             align-items: start;
             background-color: #ffffff;
             margin-bottom: 5rem;
+            position: relative;
 
             .profile-photo {
               width: @photo-size;
               height: @photo-size;
             }
             .profile-photo_placeholder {
-              font-size: @photo-size;
-              position: relative;
+              font-size: calc(@photo-size / 1.1);
               color: var(--color_primary-1);
-              &::after {
-                content: '';
-                display: block;
-                background-color: var(--color_primary-1);
-                position: absolute;
-                bottom: 0;
-                width: calc(@photo-size);
-                height: calc(@photo-size / 5);
-              }
+              position: absolute;
+              bottom: 0;
             }
           }
           .profile-name {
