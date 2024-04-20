@@ -27,6 +27,10 @@ function handleProfilePhotoLoaded() {
 watch(
   () => route.params.username,
   (username) => {
+    resumeJSON.value = undefined
+    profilePhoto.value = undefined
+    profilePhotoLoaded.value = false
+    packageLoaded.value = false
     import(`../locale/resume/${username}.json`)
       .then((res) => {
         if (res.default) {
@@ -177,14 +181,14 @@ onBeforeUnmount(() => {
 })
 
 const PRIMARY_COLORS = [
-  '#10365c', // 深海军蓝
-  '#1A244C', // 暗蓝灰
-  '#0A4D3E', // 暗青绿色
-  '#053B2E', // 深森林绿
-  '#361C5C', // 深紫罗兰色
-  '#5C303A', // 暗酒红色
-  '#3D2B23', // 深巧克力棕
-  '#0F171B' // 近乎黑色
+  '#10365c',
+  '#1A244C',
+  '#361C5C',
+  '#0A4D3E',
+  '#053B2E',
+  '#5C303A',
+  '#3D2B23',
+  '#0F171B'
 ]
 const currentColor = ref(PRIMARY_COLORS[0])
 watch(currentColor, (color) => {
@@ -368,27 +372,28 @@ function handleDownloadPdf() {
 
     <!-- menu -->
     <div class="resume-menu">
-      <section v-if="packageLoaded" @click="handleDownloadPdf">
+      <section class="menu-item-wrap" v-if="packageLoaded" @click="handleDownloadPdf">
         <el-icon v-if="downloadLoading" class="menu-item is-loading"><Loading /></el-icon>
         <el-icon v-else class="menu-item"><Download /></el-icon>
       </section>
 
       <el-dropdown
+        class="menu-item-wrap"
         trigger="click"
         :hide-on-click="false"
         @command="(locale: Locale) => localeStore.setLocale(locale)"
       >
-        <section>
-          <el-icon class="menu-item"><Menu /></el-icon>
-        </section>
+        <el-icon class="menu-item"><Menu /></el-icon>
         <template #dropdown>
-          <el-dropdown-menu>
+          <el-dropdown-menu class="dropdown-menu_locale">
             <el-dropdown-item
               v-for="(resume, locale) in resumeJSON"
               :key="locale"
               :command="locale"
-              :disabled="locale === localeStore.locale"
-              class="dropdown-item_locale"
+              :class="{
+                'dropdown-item_locale': true,
+                'dropdown-item_locale_active': locale === localeStore.locale
+              }"
             >
               {{ locale }}
             </el-dropdown-item>
@@ -398,13 +403,12 @@ function handleDownloadPdf() {
 
       <!-- set primary color -->
       <el-dropdown
+        class="menu-item-wrap"
         trigger="click"
         :hide-on-click="false"
         @command="(color: string) => (currentColor = color)"
       >
-        <section>
-          <el-icon><BrushFilled /></el-icon>
-        </section>
+        <el-icon><BrushFilled /></el-icon>
         <template #dropdown>
           <el-dropdown-menu class="dropdown-menu_color">
             <el-dropdown-item
@@ -665,9 +669,9 @@ a {
 
   .resume-zoom {
     position: fixed;
-    right: 2vw;
-    bottom: 5vh;
-    height: 30vh;
+    right: 8px;
+    bottom: 15px;
+    height: 120px;
   }
 
   .resume-menu {
@@ -679,13 +683,13 @@ a {
     align-items: center;
     border-radius: 0 0 0 4px;
     overflow: hidden;
-    background-color: #f0f0f0;
+    background-color: #efefef;
 
-    section {
+    .menu-item-wrap {
       background-color: #ffffff;
       padding: 5px;
       cursor: pointer;
-      margin-right: 2px;
+      margin-right: 1px;
 
       &:last-child {
         margin-right: 0;
@@ -693,7 +697,7 @@ a {
 
       .el-icon {
         opacity: 0.5;
-        font-size: 18px;
+        font-size: 20px;
         color: var(--color_primary-1);
       }
 
@@ -712,28 +716,46 @@ a {
   .el-scrollbar {
     .el-scrollbar__wrap {
       .el-scrollbar__view.el-dropdown__list {
-        ul.el-dropdown-menu.dropdown-menu_color {
-          padding: 5px;
-          :deep(.el-dropdown-menu__item.dropdown-item_color) {
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            padding: 1px;
-            margin-bottom: 1px;
-
-            &:last-child {
-              margin-bottom: 0;
+        ul.el-dropdown-menu {
+          &.dropdown-menu_locale {
+            :deep(.el-dropdown-menu__item.dropdown-item_locale) {
+              line-height: 1;
+              width: 50px;
+              height: 24px;
+              text-align: center;
+              &:hover {
+                background-color: #efefef;
+              }
+              &.dropdown-item_locale_active {
+                font-weight: bold;
+                background-color: #efefef;
+              }
             }
+          }
 
-            &:hover,
-            &.dropdown-item_color_active {
+          &.dropdown-menu_color {
+            padding: 5px;
+            :deep(.el-dropdown-menu__item.dropdown-item_color) {
               padding: 0;
-            }
+              width: 24px;
+              height: 24px;
+              padding: 1px;
+              margin-bottom: 1px;
 
-            .dropdown-item-inner {
-              width: 100%;
-              height: 100%;
-              border-radius: 2px;
+              &:last-child {
+                margin-bottom: 0;
+              }
+
+              &:hover,
+              &.dropdown-item_color_active {
+                padding: 0;
+              }
+
+              .dropdown-item-inner {
+                width: 100%;
+                height: 100%;
+                border-radius: 2px;
+              }
             }
           }
         }
