@@ -388,8 +388,8 @@ function handleDownloadPdf() {
     <!-- menu -->
     <div class="resume-menu">
       <section class="menu-item-wrap" v-if="packageLoaded" @click="handleDownloadPdf">
-        <el-icon v-if="downloadLoading" class="menu-item is-loading"><Loading /></el-icon>
-        <el-icon v-else class="menu-item"><Download /></el-icon>
+        <LoadingOutlined v-if="downloadLoading" class="menu-item is-loading" />
+        <DownloadOutlined v-else class="menu-item" />
       </section>
 
       <el-dropdown
@@ -398,7 +398,7 @@ function handleDownloadPdf() {
         :hide-on-click="false"
         @command="(locale: Locale) => localeStore.setLocale(locale)"
       >
-        <el-icon class="menu-item"><Menu /></el-icon>
+        <TranslationOutlined class="menu-item" />
         <template #dropdown>
           <el-dropdown-menu class="dropdown-menu_locale">
             <el-dropdown-item
@@ -423,7 +423,7 @@ function handleDownloadPdf() {
         :hide-on-click="false"
         @command="(color: string) => (currentColor = color)"
       >
-        <el-icon><BrushFilled /></el-icon>
+        <BgColorsOutlined class="menu-item" />
         <template #dropdown>
           <el-dropdown-menu class="dropdown-menu_color">
             <el-dropdown-item
@@ -702,24 +702,28 @@ a {
     background-color: #efefef;
 
     .menu-item-wrap {
+      width: 30px;
+      height: 30px;
       background-color: #ffffff;
-      padding: 5px;
       cursor: pointer;
       margin-right: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &:last-child {
         margin-right: 0;
       }
 
-      .el-icon {
+      .menu-item {
         opacity: 0.5;
-        font-size: 20px;
+        font-size: 18px;
         color: var(--color_primary-1);
       }
 
       &:hover,
       &:active {
-        .el-icon {
+        .menu-item {
           opacity: 1;
         }
       }
