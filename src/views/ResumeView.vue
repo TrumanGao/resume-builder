@@ -10,6 +10,17 @@ import debounce from 'lodash.debounce'
 import { EventManager, caniuse_webp } from 'trumangao-utils'
 const _e = new EventManager()
 import { downloadPDF, isWechat } from '../utils/tool'
+import {
+  DownloadOutlined,
+  LoadingOutlined,
+  TranslationOutlined,
+  BgColorsOutlined,
+  HomeOutlined,
+  EnvironmentOutlined,
+  MailOutlined,
+  MobileOutlined,
+  WechatOutlined
+} from '@ant-design/icons-vue'
 
 /**
  * 数据源
@@ -271,20 +282,25 @@ function handleDownloadPdf() {
 
           <section v-if="Object.keys(resumeData.detail)?.length" class="resume-detail left-section">
             <div class="left-title">{{ localeStore.message.RESUME_DETAIL }}</div>
-            <div v-if="resumeData.detail.origin" class="left-text right-item">
-              {{ localeStore.message.RESUME_DETAIL_ORIGN }}: {{ resumeData.detail.origin }}
+            <div v-if="resumeData.detail.origin" class="left-item">
+              <HomeOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.origin }}</span>
             </div>
-            <div v-if="resumeData.detail.address" class="left-text left-item">
-              {{ localeStore.message.RESUME_DETAIL_ADDRESS }}: {{ resumeData.detail.address }}
+            <div v-if="resumeData.detail.address" class="left-item">
+              <EnvironmentOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.address }}</span>
             </div>
-            <div v-if="resumeData.detail.email" class="left-text left-item">
-              {{ localeStore.message.RESUME_DETAIL_EMAIL }}: {{ resumeData.detail.email }}
+            <div v-if="resumeData.detail.email" class="left-item">
+              <MailOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.email }}</span>
             </div>
-            <div v-if="resumeData.detail.phone" class="left-text left-item">
-              {{ localeStore.message.RESUME_DETAIL_PHONE }}: {{ resumeData.detail.phone }}
+            <div v-if="resumeData.detail.phone" class="left-item">
+              <MobileOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.phone }}</span>
             </div>
-            <div v-if="resumeData.detail.wechat" class="left-text left-item">
-              {{ localeStore.message.RESUME_DETAIL_WECHAT }}: {{ resumeData.detail.wechat }}
+            <div v-if="resumeData.detail.wechat" class="left-item">
+              <WechatOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.wechat }}</span>
             </div>
           </section>
 
@@ -436,7 +452,7 @@ function handleDownloadPdf() {
 @main-height: calc(@main-width / 210 * 297);
 @main-left-width: calc(@main-width * 0.618 * 0.618);
 @main-padding_vertical: 50rem;
-@main-padding_horizontal: 40rem;
+@main-padding_horizontal: 38rem;
 @photo-size: calc(@main-left-width - @main-padding_horizontal * 2);
 
 @margin-bottom_left-section: 30rem;
@@ -482,15 +498,11 @@ function handleDownloadPdf() {
     font-size: @font-size_title;
     margin-bottom: @margin-bottom_title;
     font-weight: 800;
-    white-space: normal;
-    word-wrap: break-word;
   }
   .right-subtitle {
     font-size: @font-size_subtitle;
     margin-bottom: @margin-bottom_subtitle;
     font-weight: 600;
-    white-space: normal;
-    word-wrap: break-word;
   }
   .left-text,
   .right-text {
@@ -504,7 +516,7 @@ function handleDownloadPdf() {
     font-size: @font-size_minitext;
     margin-bottom: @margin-bottom_minitext;
     font-weight: 400;
-    color: #999999;
+    color: #888888;
     white-space: normal;
     word-wrap: break-word;
   }
@@ -545,6 +557,7 @@ a {
         height: @main-height;
         background-color: var(--color_primary-1);
         color: #ffffff;
+        overflow: hidden;
 
         .resume-profile {
           display: flex;
@@ -596,8 +609,19 @@ a {
         .resume-detail {
           // .left-title {
           // }
-          // .left-text {
-          // }
+          .left-item {
+            display: flex;
+            font-size: @font-size_text;
+            .detail-icon {
+              margin-right: 4rem;
+              display: flex;
+              align-items: center;
+            }
+            .left-text {
+              flex-shrink: 0;
+              white-space: nowrap;
+            }
+          }
         }
         .resume-skill {
           // .left-title {
