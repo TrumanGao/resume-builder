@@ -176,7 +176,16 @@ onBeforeUnmount(() => {
   _e.removeEventListener('orientationchange', 'window_orientationchange_handleResize', window)
 })
 
-const PRIMARY_COLORS = ['#10365c', '#331B1B', '#0A4D3E', '#0F171B', '#1A244C', '#3D2B23']
+const PRIMARY_COLORS = [
+  '#10365c', // 深海军蓝
+  '#1A244C', // 暗蓝灰
+  '#0A4D3E', // 暗青绿色
+  '#053B2E', // 深森林绿
+  '#361C5C', // 深紫罗兰色
+  '#5C303A', // 暗酒红色
+  '#3D2B23', // 深巧克力棕
+  '#0F171B' // 近乎黑色
+]
 const currentColor = ref(PRIMARY_COLORS[0])
 watch(currentColor, (color) => {
   document.documentElement.style.setProperty('--color_primary-1', color)
@@ -379,7 +388,7 @@ function handleDownloadPdf() {
               :key="locale"
               :command="locale"
               :disabled="locale === localeStore.locale"
-              class="dropdown-item dropdown-item_locale"
+              class="dropdown-item_locale"
             >
               {{ locale }}
             </el-dropdown-item>
@@ -397,13 +406,15 @@ function handleDownloadPdf() {
           <el-icon><BrushFilled /></el-icon>
         </section>
         <template #dropdown>
-          <el-dropdown-menu class="dropdown-menu dropdown-menu_color">
+          <el-dropdown-menu class="dropdown-menu_color">
             <el-dropdown-item
               v-for="color in PRIMARY_COLORS"
               :key="color"
               :command="color"
-              :disabled="color === currentColor"
-              class="dropdown-item"
+              :class="{
+                'dropdown-item_color': true,
+                'dropdown-item_color_active': color === currentColor
+              }"
             >
               <div class="dropdown-item-inner" :style="{ backgroundColor: color }"></div>
             </el-dropdown-item>
@@ -703,11 +714,26 @@ a {
       .el-scrollbar__view.el-dropdown__list {
         ul.el-dropdown-menu.dropdown-menu_color {
           padding: 5px;
-          :deep(.el-dropdown-menu__item) {
-            padding: 2px;
+          :deep(.el-dropdown-menu__item.dropdown-item_color) {
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            padding: 1px;
+            margin-bottom: 1px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            &:hover,
+            &.dropdown-item_color_active {
+              padding: 0;
+            }
+
             .dropdown-item-inner {
-              width: 20px;
-              height: 20px;
+              width: 100%;
+              height: 100%;
+              border-radius: 2px;
             }
           }
         }
