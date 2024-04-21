@@ -271,10 +271,10 @@ function handleDownloadPdf() {
               />
               <UserOutlined v-show="!profilePhotoLoaded" class="profile-photo_placeholder" />
             </div>
-            <div v-if="resumeData.profile.name" class="profile-name">
+            <div v-if="resumeData.profile?.name" class="profile-name">
               {{ resumeData.profile.name }}
             </div>
-            <div v-if="resumeData.profile.job" class="profile-job">
+            <div v-if="resumeData.profile?.job" class="profile-job">
               {{ resumeData.profile.job }}
             </div>
           </section>
@@ -303,7 +303,7 @@ function handleDownloadPdf() {
             </div>
           </section>
 
-          <section v-if="resumeData.skill.length" class="resume-skill left-section">
+          <section v-if="resumeData.skill?.length" class="resume-skill left-section">
             <div class="left-title">{{ localeStore.message.RESUME_SKILLS }}</div>
             <div class="left-item skill-item" v-for="skill in resumeData.skill" :key="skill">
               <div class="left-text skill-item">{{ skill }}</div>
@@ -312,14 +312,14 @@ function handleDownloadPdf() {
         </div>
 
         <div class="resume-right">
-          <section v-if="resumeData.statment.content" class="resume-statment right-section">
+          <section v-if="resumeData.statment?.content" class="resume-statment right-section">
             <div class="right-title">{{ localeStore.message.RESUME_STATMENT }}</div>
             <div class="right-text statment-content">
               {{ resumeData.statment.content }}
             </div>
           </section>
 
-          <section v-if="resumeData.education.length" class="resume-education right-section">
+          <section v-if="resumeData.education?.length" class="resume-education right-section">
             <div class="right-title">{{ localeStore.message.RESUME_EDUCATION }}</div>
             <div
               class="right-item education-item"
@@ -334,7 +334,7 @@ function handleDownloadPdf() {
             </div>
           </section>
 
-          <section v-if="resumeData.employment.length" class="resume-employment right-section">
+          <section v-if="resumeData.employment?.length" class="resume-employment right-section">
             <div class="right-title">{{ localeStore.message.RESUME_EMPLOYMENT }}</div>
             <div
               class="right-item employment-item"
@@ -347,7 +347,7 @@ function handleDownloadPdf() {
             </div>
           </section>
 
-          <section v-if="resumeData.project.length" class="resume-project right-section">
+          <section v-if="resumeData.project?.length" class="resume-project right-section">
             <div class="right-title">{{ localeStore.message.RESUME_PROJECTS }}</div>
             <div
               class="right-item project-item"
@@ -361,7 +361,7 @@ function handleDownloadPdf() {
             </div>
           </section>
 
-          <section v-if="resumeData.link.length" class="resume-link right-section">
+          <section v-if="resumeData.link?.length" class="resume-link right-section">
             <div class="right-title">{{ localeStore.message.RESUME_LINKS }}</div>
             <div class="right-item link-item" v-for="link in resumeData.link" :key="link.url">
               <div class="right-subtitle link-label">{{ link.label }}</div>

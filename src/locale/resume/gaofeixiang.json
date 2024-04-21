@@ -21,23 +21,23 @@
       "Python"
     ],
     "statment": {
-      "content": "我叫高飞翔，2016年本科毕业于河南大学，现就职于猿辅导，担任IDE组技术组长，负责“猿课堂”系列产品的开发。"
+      "content": "高飞翔，1993年7月生，2016年本科毕业于河南大学，目前就职于在线教育品牌猿辅导，担任猿编程部门IDE研发团队技术组长，负责“猿课堂”系列产品的开发。"
     },
     "employment": [
       {
         "employer": "北京猿力科技有限公司",
         "time": "2020.09 - 至今",
-        "description": "工作重点：技术团队建设；前端工程化；公共库开发；PC端/移动端网站、客户端应用、服务端应用、跨平台物联开发。"
+        "description": "技术团队建设；前端工程化；公共库开发；PC端/移动端网站、桌面应用程序、服务端应用、跨平台物联开发。"
       },
       {
         "employer": "北京名锐普能科技有限公司",
         "time": "2019.10 - 2020.08",
-        "description": "工作重点：承接多家国企事业单位的后台管理系统开发。"
+        "description": "负责合作企业的门户网站、在线商城、后台管理系统、微信小程序等的开发。"
       },
       {
         "employer": "芯易科技（北京）有限公司",
         "time": "2019.02 - 2019.08",
-        "description": "工作重点：移动端开发，包括微信小程序、支付宝小程序、H5。"
+        "description": "移动端开发，包括移动端网站、微信小程序、支付宝小程序。"
       }
     ],
     "education": [
@@ -91,36 +91,30 @@
       "Python"
     ],
     "statment": {
-      "content": "My name is Gao Feixiang, and I graduated with a bachelor's degree from Henan University in 2016. I am currently working at Yuanfudao, serving as the Technical Team Leader for the IDE group, responsible for the development of the 'Yuan KeTang' series of products."
+      "content": "Gao Feixiang, born in July 1993, graduated with a bachelor's degree from Henan University in 2016, currently heads the YBC IDE tech team at Yuanfudao, responsible for the development of 'YBC Classroom' product series."
     },
     "employment": [
       {
         "employer": "Beijing Ape Power Technology Co., Ltd.",
-        "time": "September 2020 - Present",
-        "description": "Key Responsibilities: Technical team building; Front-end engineering practices; Development of shared libraries; Creation of web applications for both PC and mobile platforms, client-side applications, server-side applications, and cross-platform IoT development (using node.js, MicroPython, ect.)."
+        "time": "2020.09 - Present",
+        "description": "Technical team building; front-end engineering optimization; public lib creation; multi-platform web/mobile/desktop/server applications, and IoT across platforms development."
       },
       {
         "employer": "Beijing Ming Rui Pu Neng Technology Co., Ltd.",
-        "time": "October 2019 - August 2020",
-        "description": "Key responsibilities involved developing backend management systems for multiple state-owned enterprises and public institutions."
+        "time": "2019.10 - 2020.08",
+        "description": "Developing corporate portal, online shopping mall, back-end management system, and WeChat mini programs."
       },
       {
         "employer": "Xinyi Technology (Beijing) Co., Ltd.",
-        "time": "February 2019 - August 2019",
-        "description": "Focused on mobile development, including WeChat Mini Programs, Alipay Mini Programs, and H5."
+        "time": "2019.02 - 2019.08",
+        "description": "Mobile development encompasses responsive websites, WeChat mini-programs, and Alipay mini-apps."
       }
     ],
     "education": [
       {
         "school": "Henan University",
         "degree": "Bachelor's Degree",
-        "time": "September 2012 - June 2016"
-      }
-    ],
-    "project": [
-      {
-        "label": "Graphical IDE",
-        "url": "https://contest.ybccode.com/ide/"
+        "time": "2012.09 - 2016.06"
       }
     ],
     "link": [
@@ -131,10 +125,6 @@
       {
         "label": "npm",
         "url": "https://www.npmjs.com/~trumangao"
-      },
-      {
-        "label": "csdn",
-        "url": "https://blog.csdn.net/TrumanGao"
       }
     ]
   }
