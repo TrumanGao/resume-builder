@@ -67,8 +67,7 @@ export default {
       job: 'Full Stack Developer (JavaScript)'
     },
     detail: {
-      origin: 'Luoyang, Henan',
-      address: 'Beijing',
+      address: 'Beijing, China',
       email: 'trumangao@outlook.com',
       phone: '+86 15152230868',
       wechat: '15152230868'
