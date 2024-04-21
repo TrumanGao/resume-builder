@@ -685,9 +685,9 @@ a {
 
   .resume-zoom {
     position: fixed;
-    right: 8px;
-    bottom: 15px;
-    height: 120px;
+    right: 3vw;
+    bottom: 2vh;
+    height: 20vh;
   }
 
   .resume-menu {
@@ -702,14 +702,9 @@ a {
     background-color: #efefef;
 
     .menu-item-wrap {
-      width: 30px;
-      height: 30px;
       background-color: #ffffff;
       cursor: pointer;
       margin-right: 1px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
 
       &:last-child {
         margin-right: 0;
@@ -719,6 +714,11 @@ a {
         opacity: 0.5;
         font-size: 18px;
         color: var(--color_primary-1);
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       &:hover,
