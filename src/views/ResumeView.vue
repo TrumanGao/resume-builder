@@ -43,7 +43,7 @@ watch(
     profilePhoto.value = undefined
     profilePhotoLoaded.value = false
     packageLoaded.value = false
-    import(`../locale/resume/${username}.json`)
+    import(`../locale/resume/${username}.ts`)
       .then((res) => {
         if (res.default) {
           resumeJSON.value = res.default as ResumeJSON
@@ -501,7 +501,7 @@ function handleDownloadPdf() {
   .right-subtitle {
     font-size: @font-size_subtitle;
     margin-bottom: @margin-bottom_subtitle;
-    font-weight: 600;
+    font-weight: bold;
   }
   .left-text,
   .right-text {
