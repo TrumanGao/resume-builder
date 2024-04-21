@@ -1,0 +1,40 @@
+{
+  "zh": {
+    "FILE_DID_NOT_FOUND": "文件未找到",
+    "FILE_LOAD_ERROR": "文件加载失败",
+    "WEBP_NOT_SUPPORTED": "您的浏览器不支持webp格式图片",
+    "MESSAGE_OPEN_IN_BROWSER": "请点击右上角，在浏览器打开",
+    "MESSAGE_DOWNLOAD_RESUME": "是否下载简历？",
+    "MESSAGE_TITLE_INFO": "提示",
+    "MESSAGE_CONFIRM": "确定",
+    "MESSAGE_CANCEL": "取消",
+    "RESUME_DETAIL": "基本信息",
+    "RESUME_SKILLS": "技术栈",
+    "RESUME_STATMENT": "个人陈述",
+    "RESUME_EDUCATION": "教育经历",
+    "RESUME_EMPLOYMENT": "工作经历",
+    "RESUME_PROJECTS": "项目作品",
+    "RESUME_LINKS": "个人主页",
+    "DOWNLOAD_RESUME": "下载PDF",
+    "SELECT_LOCALE": "选择语言"
+  },
+  "en": {
+    "FILE_DID_NOT_FOUND": "File did not found",
+    "FILE_LOAD_ERROR": "File load error",
+    "WEBP_NOT_SUPPORTED": "Your browser does not support webp format images",
+    "MESSAGE_OPEN_IN_BROWSER": "Please click the top right corner to open in browser",
+    "MESSAGE_DOWNLOAD_RESUME": "Do you want to download the resume?",
+    "MESSAGE_TITLE_INFO": "Info",
+    "MESSAGE_CONFIRM": "Confirm",
+    "MESSAGE_CANCEL": "Cancel",
+    "RESUME_DETAIL": "Detail",
+    "RESUME_SKILLS": "Skills",
+    "RESUME_STATMENT": "Statment",
+    "RESUME_EDUCATION": "Education",
+    "RESUME_EMPLOYMENT": "Employment",
+    "RESUME_PROJECTS": "Projects",
+    "RESUME_LINKS": "Links",
+    "DOWNLOAD_RESUME": "Download PDF",
+    "SELECT_LOCALE": "Select Locale"
+  }
+}

@@ -1,72 +1,125 @@
 <!-- https://www.npmjs.com/package/jspdf -->
 <script setup lang="ts">
-import { onBeforeMount, onMounted, ref, watch, onBeforeUnmount } from 'vue'
+import { onBeforeMount, onMounted, ref, watch, onBeforeUnmount, computed } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-import { useResumeStore } from '../stores/resume'
-const resumeStore = useResumeStore()
-import { type ResumeData } from '../index.d'
+import { useLocaleStore } from '../stores/locale'
+const localeStore = useLocaleStore()
+import type { ResumeJSON, Locale } from '../index.d'
 import debounce from 'lodash.debounce'
 import { EventManager, caniuse_webp } from 'trumangao-utils'
 const _e = new EventManager()
 import { downloadPDF, isWechat } from '../utils/tool'
-import('html2canvas')
-import('jspdf')
+import {
+  UserOutlined,
+  DownloadOutlined,
+  LoadingOutlined,
+  TranslationOutlined,
+  BgColorsOutlined,
+  HomeOutlined,
+  EnvironmentOutlined,
+  MailOutlined,
+  MobileOutlined,
+  WechatOutlined
+} from '@ant-design/icons-vue'
 
 /**
  * 数据源
  */
-const profilePhoto = ref('')
+const resumeJSON = ref<ResumeJSON>()
+const profilePhoto = ref<string>()
 const profilePhotoLoaded = ref(false)
-const resumeData = ref<ResumeData>({
-  profile: {},
-  detail: {},
-  skill: [],
-  statment: {},
-  education: [],
-  employment: [],
-  project: [],
-  link: []
-})
-const resumeTitle = ref('')
+const packageLoaded = ref(false)
+function handleProfilePhotoLoaded() {
+  profilePhotoLoaded.value = true
+  Promise.all([import('html2canvas'), import('jspdf')])
+    .then(() => (packageLoaded.value = true))
+    .catch(() => (packageLoaded.value = true))
+}
 watch(
   () => route.params.username,
   (username) => {
-    if (!resumeStore.resumeMap[username as string]) {
-      return
-    }
-    import(`../assets/img/profile-photo/${username}.webp`)
+    resumeJSON.value = undefined
+    profilePhoto.value = undefined
+    profilePhotoLoaded.value = false
+    packageLoaded.value = false
+    import(`../locale/resume/${username}.ts`)
       .then((res) => {
-        if (caniuse_webp()) {
-          profilePhoto.value = res.default
+        if (res.default) {
+          resumeJSON.value = res.default as ResumeJSON
+          /**
+           * when first loaded, if the current language does not exist,
+           * switch to the first existing language
+           */
+          if (!resumeJSON.value[localeStore.locale]) {
+            localeStore.setLocale(Object.keys(resumeJSON.value)[0])
+          }
         } else {
-          throw new Error('Webp not supported. ')
+          throw new Error(localeStore.message.FILE_DID_NOT_FOUND)
         }
       })
       .catch((error) => {
-        console.log('Webp load error. ', error)
-        import(`../assets/img/profile-photo/${username}.jpg`).then((res) => {
-          profilePhoto.value = res.default
+        ElMessage({
+          message: error.message || localeStore.message.FILE_LOAD_ERROR,
+          type: 'error',
+          plain: true,
+          grouping: true,
+          showClose: true
         })
       })
-    resumeData.value = resumeStore.resumeMap[username as string].zh
-    resumeTitle.value = `${resumeData.value.profile.name}-${resumeData.value.profile.job}`
-    document.title = resumeTitle.value
+
+    import(`../assets/img/profile-photo/${username}.webp`)
+      .then(async (res) => {
+        if (!res.default) {
+          throw new Error(localeStore.message.FILE_DID_NOT_FOUND)
+        } else if (!caniuse_webp()) {
+          throw new Error(localeStore.message.WEBP_NOT_SUPPORTED)
+        } else {
+          profilePhoto.value = res.default
+        }
+      })
+      .catch(async () => {
+        const res = await import(`../assets/img/profile-photo/${username}.jpg`)
+        if (!res.default) {
+          throw new Error(localeStore.message.FILE_DID_NOT_FOUND)
+        } else {
+          profilePhoto.value = res.default
+        }
+      })
+      .catch((error) => {
+        ElMessage({
+          message: error.message || localeStore.message.FILE_LOAD_ERROR,
+          type: 'error',
+          plain: true,
+          grouping: true,
+          showClose: true
+        })
+      })
   },
   {
     immediate: true
   }
 )
+const resumeData = computed(() => resumeJSON.value?.[localeStore.locale])
+const resumeTitle = computed(
+  () => `${resumeData?.value?.profile.name}-${resumeData?.value?.profile.job}`
+)
+watch(resumeTitle, (title) => {
+  document.title = title
+})
 
+/**
+ * debounce when resize
+ */
 const DEBOUNCE_DURATION = 100
 /**
- * 调整屏幕尺寸/方向
+ * resize orientation and screen size
  */
 const orientation = ref('landscape')
 const fontSizeRatioMin = ref(50)
 const fontSizeRatioMax = ref(150)
 /**
- * 调整简历尺寸
+ * resize resume size
  */
 const fontSizeInit = 0.1
 const fontSizeRatio = ref(100)
@@ -139,31 +192,62 @@ onBeforeUnmount(() => {
   _e.removeEventListener('orientationchange', 'window_orientationchange_handleResize', window)
 })
 
+const PRIMARY_COLORS = [
+  '#10365c',
+  '#1A244C',
+  '#361C5C',
+  '#0A4D3E',
+  '#053B2E',
+  '#5C303A',
+  '#3D2B23',
+  '#0F171B'
+]
+const currentColor = ref(PRIMARY_COLORS[0])
+watch(currentColor, (color) => {
+  document.documentElement.style.setProperty('--color_primary-1', color)
+})
+
 const downloadLoading = ref(false)
 function handleDownloadPdf() {
+  if (downloadLoading.value) {
+    return
+  }
+
   if (isWechat()) {
     return ElMessage({
-      message: '请点击右上角，在浏览器打开',
+      message: localeStore.message.MESSAGE_OPEN_IN_BROWSER,
       type: 'warning',
       plain: true,
       grouping: true,
       showClose: true
     })
   }
-  if (downloadLoading.value) {
-    return
-  }
-  downloadLoading.value = true
-  fontSizeRatio.value = 100 // fontSizeRatioMax.value
-  // 延迟不能少于 debounce 的时间，即 DEBOUNCE_DURATION
-  setTimeout(() => {
-    downloadPDF({
-      element: document.querySelector('.resume-main') as HTMLElement,
-      pdfName: `${resumeTitle.value}.pdf`
+
+  ElMessageBox.confirm(
+    localeStore.message.MESSAGE_DOWNLOAD_RESUME,
+    localeStore.message.MESSAGE_TITLE_INFO,
+    {
+      confirmButtonText: localeStore.message.MESSAGE_CONFIRM,
+      cancelButtonText: localeStore.message.MESSAGE_CANCEL,
+      type: 'warning'
+    }
+  )
+    .then(() => {
+      downloadLoading.value = true
+      fontSizeRatio.value = 100 // fontSizeRatioMax.value
+      /**
+       * @warn 不能少于 debounce 的时间，即 DEBOUNCE_DURATION
+       */
+      setTimeout(() => {
+        downloadPDF({
+          element: document.querySelector('.resume-main') as HTMLElement,
+          pdfName: `${resumeTitle.value}.pdf`
+        })
+          .then(() => setTimeout(() => (downloadLoading.value = false), 500))
+          .catch(() => (downloadLoading.value = false))
+      }, DEBOUNCE_DURATION + 100)
     })
-      .then(() => setTimeout(() => (downloadLoading.value = false), 500))
-      .catch(() => (downloadLoading.value = false))
-  }, DEBOUNCE_DURATION + 100)
+    .catch(() => {})
 }
 </script>
 
@@ -174,7 +258,7 @@ function handleDownloadPdf() {
       :style="{ padding: orientation === 'landscape' ? '0 5vh' : '5vh 0' }"
     >
       <!-- page -->
-      <div class="resume-main">
+      <div class="resume-main" v-if="resumeData">
         <div class="resume-left">
           <section class="resume-profile left-section">
             <div class="profile-photo-container">
@@ -182,42 +266,45 @@ function handleDownloadPdf() {
                 v-show="profilePhotoLoaded"
                 class="profile-photo"
                 :src="profilePhoto"
-                alt="照片"
-                @load="() => (profilePhotoLoaded = true)"
+                alt="photo"
+                @load="handleProfilePhotoLoaded"
               />
-              <el-icon v-show="!profilePhotoLoaded" class="profile-photo_placeholder">
-                <Avatar />
-              </el-icon>
+              <UserOutlined v-show="!profilePhotoLoaded" class="profile-photo_placeholder" />
             </div>
-            <div v-if="resumeData.profile.name" class="profile-name">
+            <div v-if="resumeData.profile?.name" class="profile-name">
               {{ resumeData.profile.name }}
             </div>
-            <div v-if="resumeData.profile.job" class="profile-job">
+            <div v-if="resumeData.profile?.job" class="profile-job">
               {{ resumeData.profile.job }}
             </div>
           </section>
 
           <section v-if="Object.keys(resumeData.detail)?.length" class="resume-detail left-section">
-            <div class="left-title">基本信息</div>
-            <div v-if="resumeData.detail.origin" class="left-text right-item">
-              籍贯：{{ resumeData.detail.origin }}
+            <div class="left-title">{{ localeStore.message.RESUME_DETAIL }}</div>
+            <div v-if="resumeData.detail.origin" class="left-item">
+              <HomeOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.origin }}</span>
             </div>
-            <div v-if="resumeData.detail.address" class="left-text left-item">
-              现居地：{{ resumeData.detail.address }}
+            <div v-if="resumeData.detail.address" class="left-item">
+              <EnvironmentOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.address }}</span>
             </div>
-            <div v-if="resumeData.detail.email" class="left-text left-item">
-              邮箱：{{ resumeData.detail.email }}
+            <div v-if="resumeData.detail.email" class="left-item">
+              <MailOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.email }}</span>
             </div>
-            <div v-if="resumeData.detail.phone" class="left-text left-item">
-              手机号码：{{ resumeData.detail.phone }}
+            <div v-if="resumeData.detail.phone" class="left-item">
+              <MobileOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.phone }}</span>
             </div>
-            <div v-if="resumeData.detail.wechat" class="left-text left-item">
-              微信：{{ resumeData.detail.wechat }}
+            <div v-if="resumeData.detail.wechat" class="left-item">
+              <WechatOutlined class="detail-icon" />
+              <span class="left-text">{{ resumeData.detail.wechat }}</span>
             </div>
           </section>
 
-          <section v-if="resumeData.skill.length" class="resume-skill left-section">
-            <div class="left-title">技术栈</div>
+          <section v-if="resumeData.skill?.length" class="resume-skill left-section">
+            <div class="left-title">{{ localeStore.message.RESUME_SKILLS }}</div>
             <div class="left-item skill-item" v-for="skill in resumeData.skill" :key="skill">
               <div class="left-text skill-item">{{ skill }}</div>
             </div>
@@ -225,15 +312,15 @@ function handleDownloadPdf() {
         </div>
 
         <div class="resume-right">
-          <section v-if="resumeData.statment.content" class="resume-statment right-section">
-            <div class="right-title">个人陈述</div>
+          <section v-if="resumeData.statment?.content" class="resume-statment right-section">
+            <div class="right-title">{{ localeStore.message.RESUME_STATMENT }}</div>
             <div class="right-text statment-content">
               {{ resumeData.statment.content }}
             </div>
           </section>
 
-          <section v-if="resumeData.education.length" class="resume-education right-section">
-            <div class="right-title">教育经历</div>
+          <section v-if="resumeData.education?.length" class="resume-education right-section">
+            <div class="right-title">{{ localeStore.message.RESUME_EDUCATION }}</div>
             <div
               class="right-item education-item"
               v-for="education in resumeData.education"
@@ -247,8 +334,8 @@ function handleDownloadPdf() {
             </div>
           </section>
 
-          <section v-if="resumeData.employment.length" class="resume-employment right-section">
-            <div class="right-title">工作经历</div>
+          <section v-if="resumeData.employment?.length" class="resume-employment right-section">
+            <div class="right-title">{{ localeStore.message.RESUME_EMPLOYMENT }}</div>
             <div
               class="right-item employment-item"
               v-for="employment in resumeData.employment"
@@ -260,8 +347,8 @@ function handleDownloadPdf() {
             </div>
           </section>
 
-          <section v-if="resumeData.project.length" class="resume-project right-section">
-            <div class="right-title">项目作品</div>
+          <section v-if="resumeData.project?.length" class="resume-project right-section">
+            <div class="right-title">{{ localeStore.message.RESUME_PROJECTS }}</div>
             <div
               class="right-item project-item"
               v-for="project in resumeData.project"
@@ -274,8 +361,8 @@ function handleDownloadPdf() {
             </div>
           </section>
 
-          <section v-if="resumeData.link.length" class="resume-link right-section">
-            <div class="right-title">个人主页</div>
+          <section v-if="resumeData.link?.length" class="resume-link right-section">
+            <div class="right-title">{{ localeStore.message.RESUME_LINKS }}</div>
             <div class="right-item link-item" v-for="link in resumeData.link" :key="link.url">
               <div class="right-subtitle link-label">{{ link.label }}</div>
               <a class="right-text link-url" :href="link.url" target="_blank">
@@ -297,12 +384,63 @@ function handleDownloadPdf() {
       vertical
       placement="left"
     />
-    <el-button type="plain" class="resume-download" @click="handleDownloadPdf">
-      <el-icon :class="{ 'is-loading': downloadLoading }" v-show="downloadLoading">
-        <Loading />
-      </el-icon>
-      <span v-show="!downloadLoading">下载PDF</span>
-    </el-button>
+
+    <!-- menu -->
+    <div class="resume-menu">
+      <section class="menu-item-wrap" v-if="packageLoaded" @click="handleDownloadPdf">
+        <LoadingOutlined v-if="downloadLoading" class="menu-item is-loading" />
+        <DownloadOutlined v-else class="menu-item" />
+      </section>
+
+      <el-dropdown
+        class="menu-item-wrap"
+        trigger="click"
+        :hide-on-click="false"
+        @command="(locale: Locale) => localeStore.setLocale(locale)"
+      >
+        <TranslationOutlined class="menu-item" />
+        <template #dropdown>
+          <el-dropdown-menu class="dropdown-menu_locale">
+            <el-dropdown-item
+              v-for="(resume, locale) in resumeJSON"
+              :key="locale"
+              :command="locale"
+              :class="{
+                'dropdown-item_locale': true,
+                'dropdown-item_locale_active': locale === localeStore.locale
+              }"
+            >
+              {{ locale }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+
+      <!-- set primary color -->
+      <el-dropdown
+        class="menu-item-wrap"
+        trigger="click"
+        :hide-on-click="false"
+        @command="(color: string) => (currentColor = color)"
+      >
+        <BgColorsOutlined class="menu-item" />
+        <template #dropdown>
+          <el-dropdown-menu class="dropdown-menu_color">
+            <el-dropdown-item
+              v-for="color in PRIMARY_COLORS"
+              :key="color"
+              :command="color"
+              :class="{
+                'dropdown-item_color': true,
+                'dropdown-item_color_active': color === currentColor
+              }"
+            >
+              <div class="dropdown-item-inner" :style="{ backgroundColor: color }"></div>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </div>
   </div>
 </template>
 
@@ -313,7 +451,7 @@ function handleDownloadPdf() {
 @main-height: calc(@main-width / 210 * 297);
 @main-left-width: calc(@main-width * 0.618 * 0.618);
 @main-padding_vertical: 50rem;
-@main-padding_horizontal: 40rem;
+@main-padding_horizontal: 38rem;
 @photo-size: calc(@main-left-width - @main-padding_horizontal * 2);
 
 @margin-bottom_left-section: 30rem;
@@ -327,7 +465,7 @@ function handleDownloadPdf() {
 @margin-bottom_subtitle: 2rem;
 @font-size_text: 14rem;
 @margin-bottom_text: 2rem;
-@font-size_minitext: 12rem;
+@font-size_minitext: 14rem;
 @margin-bottom_minitext: 2rem;
 
 .resume-main {
@@ -359,15 +497,11 @@ function handleDownloadPdf() {
     font-size: @font-size_title;
     margin-bottom: @margin-bottom_title;
     font-weight: 800;
-    white-space: normal;
-    word-wrap: break-word;
   }
   .right-subtitle {
     font-size: @font-size_subtitle;
     margin-bottom: @margin-bottom_subtitle;
-    font-weight: 600;
-    white-space: normal;
-    word-wrap: break-word;
+    font-weight: bold;
   }
   .left-text,
   .right-text {
@@ -381,7 +515,7 @@ function handleDownloadPdf() {
     font-size: @font-size_minitext;
     margin-bottom: @margin-bottom_minitext;
     font-weight: 400;
-    color: #999999;
+    color: #888888;
     white-space: normal;
     word-wrap: break-word;
   }
@@ -390,7 +524,7 @@ function handleDownloadPdf() {
 a {
   color: #000000;
   &:hover {
-    color: var(--color_blue-1);
+    color: var(--color_primary-1);
   }
 }
 
@@ -420,8 +554,9 @@ a {
       .resume-left {
         width: @main-left-width;
         height: @main-height;
-        background-color: var(--color_blue-1);
+        background-color: var(--color_primary-1);
         color: #ffffff;
+        overflow: hidden;
 
         .resume-profile {
           display: flex;
@@ -438,42 +573,47 @@ a {
             align-items: start;
             background-color: #ffffff;
             margin-bottom: 5rem;
+            position: relative;
 
             .profile-photo {
               width: @photo-size;
               height: @photo-size;
             }
             .profile-photo_placeholder {
-              font-size: @photo-size;
-              position: relative;
-              color: var(--color_blue-1);
-              &::after {
-                content: '';
-                display: block;
-                background-color: var(--color_blue-1);
-                position: absolute;
-                bottom: 0;
-                width: calc(@photo-size);
-                height: calc(@photo-size / 5);
-              }
+              font-size: calc(@photo-size / 1.1);
+              color: var(--color_primary-1);
+              position: absolute;
+              bottom: 0;
             }
           }
           .profile-name {
             font-size: 20rem;
             line-height: 2;
             letter-spacing: 1px;
+            text-align: center;
           }
           .profile-job {
-            font-size: 14rem;
+            font-size: 16rem;
             line-height: 1.5;
-            letter-spacing: 1px;
+            text-align: center;
           }
         }
         .resume-detail {
           // .left-title {
           // }
-          // .left-text {
-          // }
+          .left-item {
+            display: flex;
+            font-size: @font-size_text;
+            .detail-icon {
+              margin-right: 4rem;
+              display: flex;
+              align-items: center;
+            }
+            .left-text {
+              flex-shrink: 0;
+              white-space: nowrap;
+            }
+          }
         }
         .resume-skill {
           // .left-title {
@@ -545,22 +685,101 @@ a {
 
   .resume-zoom {
     position: fixed;
-    right: 2vw;
-    bottom: 5vh;
-    height: 30vh;
+    right: 3vw;
+    bottom: 2vh;
+    height: 20vh;
   }
 
-  .resume-download {
-    width: 90px;
+  .resume-menu {
     position: fixed;
-    right: 4vw;
-    top: 5vh;
+    right: 0;
+    top: 0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    border-radius: 0 0 0 4px;
+    overflow: hidden;
+    background-color: #efefef;
 
-    .el-icon {
-      font-size: 20px;
+    .menu-item-wrap {
+      background-color: #ffffff;
+      cursor: pointer;
+      margin-right: 1px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      .menu-item {
+        opacity: 0.5;
+        font-size: 18px;
+        color: var(--color_primary-1);
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &:hover,
+      &:active {
+        .menu-item {
+          opacity: 1;
+        }
+      }
     }
-    span {
-      margin-left: 0;
+  }
+}
+
+// set primary color
+.el-dropdown__popper {
+  .el-scrollbar {
+    .el-scrollbar__wrap {
+      .el-scrollbar__view.el-dropdown__list {
+        ul.el-dropdown-menu {
+          &.dropdown-menu_locale {
+            :deep(.el-dropdown-menu__item.dropdown-item_locale) {
+              line-height: 1;
+              width: 50px;
+              height: 24px;
+              text-align: center;
+              &:hover {
+                background-color: #efefef;
+              }
+              &.dropdown-item_locale_active {
+                font-weight: bold;
+                background-color: #efefef;
+              }
+            }
+          }
+
+          &.dropdown-menu_color {
+            padding: 5px;
+            :deep(.el-dropdown-menu__item.dropdown-item_color) {
+              padding: 0;
+              width: 24px;
+              height: 24px;
+              padding: 1px;
+              margin-bottom: 1px;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+
+              &:hover,
+              &.dropdown-item_color_active {
+                padding: 0;
+              }
+
+              .dropdown-item-inner {
+                width: 100%;
+                height: 100%;
+                border-radius: 2px;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
